@@ -31,6 +31,7 @@ app.use(bodyParser.urlencoded({
 
 const oracledb = require('oracledb');
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
+oracledb.autoCommit = false;
 
 async function ConectarBD() {
 

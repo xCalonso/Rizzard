@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div class="display-2">Dashboard de RIZZARD X</div>
+    <div class="display-2">Dashboard de Rizzard X</div>
     <v-layout wrap class="mt-8">
       <v-card class="pa-6 mr-3" hover @click="$router.push({ name: 'Biblioteca' })">
         <v-layout justify-center>
