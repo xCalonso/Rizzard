@@ -28,37 +28,10 @@ app.use(bodyParser.urlencoded({
   extended: false
 }));
 
-
-const oracledb = require('oracledb');
-oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
-oracledb.autoCommit = false;
-
 async function ConectarBD() {
 
-  let connection;
-
-  try {
-    connection = await oracledb.getConnection( {
-      user          : "x7160417",
-      password      : "x7160417",
-      connectString : "oracle0.ugr.es:1521/practbd.oracle0.ugr.es"
-    });
-
-  } catch (err) {
-    console.error(err);
-  } finally {
-    if (connection) {
-      console.log("Conexion establecida correctamente!!")
-      try {
-        await connection.close();
-      } catch (err) {
-        console.error(err);
-      }
-    }
-  }
 }
 
-ConectarBD();
 
 
 app.use(express.static('frontend/dist'));
