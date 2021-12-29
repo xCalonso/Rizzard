@@ -13,16 +13,16 @@ CREATE TABLE Juego(
 	nivelesRecompensa varchar(40),
 	Licencia    int,
 	Precio	int,
-	Estado boolean
+	Estado bit
 );
 
 CREATE TABLE Partida(
 	idPartida varchar(30) PRIMARY KEY,
-	Instalador  varchar(40),
 	Fecha	DATE,
 	horaGuardado  TIME,
 	horasJugadas	int,
-	estadoMaquina  varchar(500)
+	estadoMaquina  varchar(500),
+	nombreJuego varchar(30) REFERENCES Juego (nombreJuego)
 );
 
 CREATE TABLE Amigos(
@@ -44,7 +44,7 @@ CREATE TABLE Compartido(
 );
 
 CREATE TABLE Administrador(
-	nombreUsuario varchar(20) REFERENCES UsuarioActivo (nombreUsuario),
+	nombreUsuario varchar(20) REFERENCES Usuario (nombreUsuario),
 	idAdmin  varchar(20),
     PRIMARY KEY (nombreUsuario)
 );
@@ -66,9 +66,9 @@ CREATE TABLE Sesion(
 CREATE TABLE CopiaJuego(
 	numCopia int,
 	nombreJuego varchar(30) REFERENCES Juego (nombreJuego),
-	version_juego varchar(10),
+	Version varchar(10),
 	directorioInstalacion varchar(40),
-	Estado boolean,
+	Estado varchar(20),
 	nombreUsuario varchar(20) REFERENCES Usuario (nombreUsuario),
 	PRIMARY KEY (numCopia, nombreJuego)
 );
