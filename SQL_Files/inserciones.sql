@@ -14,14 +14,14 @@ INSERT INTO Juego (nombreJuego, Categoria, Pegi, Instalador, nivelesRecompensa, 
 	('Cyberpunk 2077', 'Aventura Violencia', 18, '/usuario/partidas', '25,50,100', 7434321, 80,1);
 
 INSERT INTO Partida (idPartida, Fecha, horaGuardado, horasJugadas, estadoMaquina, nombreJuego) VALUES
-	('1', '2021-09-24', '16:23:32', 4, 'estado', 'GTA5'),
-	('2', '2021-06-04', '13:12:11', 2, 'estado', 'GTA5'),
-	('3', '2021-04-14', '18:25:36', 1, 'estado', 'Battlefield 2042'),
-	('4', '2021-11-13', '16:46:33', 6, 'estado', 'Grid 2'),
-	('5', '2021-07-25', '14:22:27', 12, 'estado', 'Far Cry 6'),
-	('6', '2021-04-11', '11:56:48', 45, 'estado', 'Battlefield 2042'),
-	('7', '2021-08-27', '14:31:13', 2, 'estado', 'Cyberpunk 2077'),
-	('8', '2021-09-26', '12:16:06', 100, 'estado', 'FIFA22');
+	('1', '2021-09-24', '16:23:32', 4, 'estado.dat', 'GTA5'),
+	('2', '2021-06-04', '13:12:11', 2, 'estado.dat', 'GTA5'),
+	('3', '2021-04-14', '18:25:36', 1, 'estado.dat', 'Battlefield 2042'),
+	('4', '2021-11-13', '16:46:33', 6, 'estado.dat', 'Grid 2'),
+	('5', '2021-07-25', '14:22:27', 12, 'estado.dat', 'Far Cry 6'),
+	('6', '2021-04-11', '11:56:48', 45, 'estado.dat', 'Battlefield 2042'),
+	('7', '2021-08-27', '14:31:13', 2, 'estado.dat', 'Cyberpunk 2077'),
+	('8', '2021-09-26', '12:16:06', 100, 'estado.dat', 'FIFA22');
 
 INSERT INTO Amigos (nombreUsuario1, nombreUsuario2) VALUES
 	('Pablo', 'Bece'),
@@ -78,3 +78,4 @@ INSERT INTO JuegoCompartido (numCopia, nombreJuego, nombreAmigo) VALUES
 	(2, 'FIFA22', 'Bece'),
 	(2, 'Cyberpunk 2077', 'Javi'),
 	(2, 'Far Cry 6', 'Javi');
+
