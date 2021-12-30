@@ -52,14 +52,28 @@ function handleDisconnect() {
 
 handleDisconnect();
 
-const random_ID = () => {
-  const min = 0
-  const max = 2147000000
-  const num = Math.random() * (max - min) + min;
+//
+// ────────────────────────────────────────────────────────── IV ──────
+// 				J U E G O S
+// ────────────────────────────────────────────────────────────────────
+//
 
-  return Math.round(num);
-};
+// Dar de Alta Juego
+app.post('/api/juegos/alta', (req, res) => {
+  connection.query(juegos.darAlta(req.body), function(err, rows, fields) {
+  if (err) {
+      console.log(err)
+      return res.status(412).send("Ya existe un juego con este nombre");
+    }
+    console.log(rows);
+    return res.sendStatus(200);
+  });
+})
 
+// Dar de Baja Juego
+
+
+// Listar Juegos
 
 
 app.use(express.static('frontend/dist'))

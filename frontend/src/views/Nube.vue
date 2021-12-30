@@ -2,12 +2,10 @@
     <div id="nube">
         <div class="display-1 font-weight-bold mt-6 mb-2"> Subir Partida (10) </div>
         <div style="max-width: 900px; margin: 0 auto">
-            <v-text-field :rules="[field_not_empty]" v-model="SP_10.n_usuario" placeholder="Nombre del Usuario" outlined required></v-text-field>
             <v-text-field :rules="[field_not_empty]" v-model="SP_10.n_juego" placeholder="Nombre del Juego" outlined></v-text-field>
             <v-text-field :rules="[field_not_empty]" v-model="SP_10.n_partida" placeholder="Nombre de la Partida" outlined></v-text-field>
             <v-text-field :rules="[unidades_positivas]" v-model="SP_10.horas_jugadas" placeholder="Horas Jugadas" type="number" outlined suffix="unidades"></v-text-field>
             <v-text-field :rules="[field_not_empty]" v-model="SP_10.estado" placeholder="Estado" outlined></v-text-field>
-            <v-row justify="space-around" align="center"><v-date-picker v-model="SP_10.fecha"></v-date-picker><v-time-picker v-model="SP_10.hora_guardado" use-seconds></v-time-picker></v-row>
         </div>
         <v-alert v-if="success.SP_10" text type="success" >La partida se ha subido con éxito</v-alert>
         <v-alert v-if="error.SP_10" text type="error">Ha ocurrido un error. Comprueba que los campos anteriores son correctos.</v-alert>
@@ -16,7 +14,6 @@
         
         <div class="display-1 font-weight-bold mt-6 mb-2"> Descargar Partida (11) </div>
         <div style="max-width: 900px; margin: 0 auto">
-            <v-text-field :rules="[field_not_empty]" v-model="DP_11.n_usuario" placeholder="Nombre del Usuario" outlined required></v-text-field>
             <v-text-field :rules="[unidades_positivas]" v-model="DP_11.id_partida" placeholder="Identificador de Partida" type="number" outlined suffix="unidades"></v-text-field>
         </div>
         <v-alert v-if="success.DP_11" text type="success" >La partida se descargará en breves instantes</v-alert>
@@ -26,7 +23,6 @@
         
         <div class="display-1 font-weight-bold mt-6 mb-2"> Compartir Partida (12) </div>
         <div style="max-width: 900px; margin: 0 auto">
-            <v-text-field :rules="[field_not_empty]" v-model="CP_12.n_usuario" placeholder="Nombre del Usuario" outlined required></v-text-field>
             <v-text-field :rules="[field_not_empty]" v-model="CP_12.n_amigo" placeholder="Nombre del Usuario Amigo" outlined required></v-text-field>
             <v-text-field :rules="[unidades_positivas]" v-model="CP_12.id_partida" placeholder="Identificador de Partida" type="number" outlined suffix="unidades"></v-text-field>
         </div>
@@ -35,6 +31,10 @@
         <v-btn @click="CompartirPartida" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">COMPARTIR</v-btn>
     </div>
 </template>
+
+
+// <v-row justify="space-around" align="center"><v-date-picker v-model="SP_10.fecha"></v-date-picker><v-time-picker v-model="SP_10.hora_guardado" use-seconds></v-time-picker></v-row>
+
 
 <script>
 import axios from 'axios'
@@ -47,8 +47,8 @@ export default {
       n_usuario: "",
       n_juego: "",
       n_partida: "",
-      fecha: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      hora_guardado: null,
+      fecha: (new Date(Date.now())).toISOString().substr(0, 10),
+      hora_guardado: new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes() + ':' + new Date(Date.now()).getSeconds(),
       horas_jugadas: null,
       estado: "",
     },
