@@ -71,9 +71,34 @@ app.post('/api/juegos/alta', (req, res) => {
 })
 
 // Dar de Baja Juego
-
+app.put('/api/juegos/:n_juego', (req, res) => {
+  connection.query(juegos.darBaja({
+    n_juego: req.params.n_juego
+  }), function (err, rows, fields) {
+    if (err){
+      console.log(err)
+      return res.sendStatus(404)
+    }
+    console.log(rows)
+    return res.sendStatus(200)
+  });
+})
 
 // Listar Juegos
+
+app.get('/api/juegos/:consulta', (req, res) => {
+  console.log(req.body)
+  connection.query(juegos.listar({
+    consulta: req.params.consulta
+  }), function (err, rows, fields) {
+    if (err){
+      console.log(err)
+      return res.sendStatus(404)
+    }
+    console.log(rows)
+    return res.send(rows)
+  });
+})
 
 
 app.use(express.static('frontend/dist'))

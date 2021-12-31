@@ -25,9 +25,51 @@
         
         
         <div class="display-1 font-weight-bold mt-6 mb-2">Listar Juegos (21)</div>
-        <v-alert v-if="success.LJ_21" text type="success" >Mostrando lista de juegos</v-alert>
         <v-alert v-if="error.LJ_21" text type="error">Ha ocurrido un error. No existen juegos en la Base de Datos.</v-alert>
         <v-btn @click="ListarJuegos" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">ListarJuegos</v-btn>
+        
+      <v-simple-table v-if="lista">
+        <thead>
+          <tr>
+            <th class="text-left">
+              nombreJuego
+            </th>
+            <th class="text-left">
+              Categoria
+            </th>
+            <th class="text-left">
+              Pegi
+            </th>
+            <th class="text-left">
+              Instalador
+            </th>
+            <th class="text-left">
+              nivelesRecompensa
+            </th>
+            <th class="text-left">
+              Licencia
+            </th>
+            <th class="text-left">
+              Precio
+            </th>
+            <th class="text-left">
+              Estado
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="value in lista" :key="value">
+            <td>{{value.nombreJuego}}</td> 
+            <td>{{value.Categoria}}</td>
+            <td>{{value.Pegi}}</td>
+            <td>{{value.Instalador}}</td>
+            <td>{{value.nivelesRecompensa}}</td>
+            <td>{{value.Licencia}}</td>
+            <td>{{value.Precio}}</td>
+            <td>{{value.Estado.data}}</td>
+          </tr>
+        </tbody>
+    </v-simple-table>
     </div>
 </template>
 
@@ -35,7 +77,8 @@
 
 <script>
 import axios from 'axios'
-const url = 'https://rizzard-x.herokuapp.com/#'
+//const url = 'http://localhost:8080'
+const url = 'https://rizzard-x.herokuapp.com'
 
 export default {
   data: () => ({
@@ -60,11 +103,11 @@ export default {
     },
     
     lista: null,
+    consulta: null,
     
     success: {
       DAJ_19: false,
       DBJ_20: false,
-      LJ_21: false,
     },
     
     error: {
@@ -104,11 +147,11 @@ export default {
     },
     
     async ListarJuegos(){
-      this.success.LJ_21 = false
       this.error.LJ_21 = false
+      this.consulta = 0
       
       try{
-        this.success.LJ_21 = true
+        this.lista = (await axios.get(`${url}/api/juegos/${this.consulta}}`)).data
       } catch (err) {
         this.error.LJ_21 = true
       }
