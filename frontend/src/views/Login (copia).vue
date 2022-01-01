@@ -13,14 +13,12 @@
                            <v-text-field
                               name="login"
                               label="Login"
-                              v-model="IS_15.user"
                               type="text"
                            ></v-text-field>
                            <v-text-field
                               id="password"
                               name="password"
                               label="Password"
-                              v-model="IS_15.password"
                               type="password"
                            ></v-text-field>
                         </v-form>
@@ -34,8 +32,6 @@
             </v-layout>
          </v-container>
       </v-content>
-      <v-alert v-if="error.IS_15" text type="error">Ha ocurrido un error.</v-alert>
-     
   </div>
 </template>
 
@@ -53,9 +49,8 @@ export default {
       password: ""
     },
     
-    logeado: null,
-    
     success: {
+      IS_15: false
     },
     
     error: {
@@ -64,25 +59,19 @@ export default {
   }),
   
   methods: {
-     async InicioSesion(){
+    async InicioSesion(){
+      this.success.IS_15 = false
       this.error.IS_15 = false
+      
       try{
         await axios.post(`${url}/api/login`, this.IS_15)
-        this.logeado = (await axios.get(`${url}/api/login/${this.IS_15.user}`)).data.valor
+        localStorage.user = this.IS_15.user
+        this.success.IS_15 = true
       } catch (err) {
         this.error.IS_15 = true
       }
-      if (this.logeado > 0){
-        if (this.logeado == 2){
-          localStorage.setItem('admin', this.IS_15.user)
-        }
-        localStorage.setItem('user', this.IS_15.user)
-        this.$router.push({ path: '/'})
-        this.$router.forward()
-        this.$router.go()
-      } else {
-        this.error.IS_15 = true
-      }
+      this.$router.push({ path: '/'})
+      this.$router.go(1)
     },
   }
 }

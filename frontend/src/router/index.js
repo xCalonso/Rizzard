@@ -10,19 +10,9 @@ import Register from '../views/Register.vue'
 
 Vue.use(VueRouter)
 
-/*function existToken() {
-    return !!localStorage.token;
+function existUser() {
+    return !!localStorage.getItem('user');
 }
-
-VueRouter.beforeEach((to, from, next) => {
-    if (to.path != '/login' && existToken()) {
-        next();
-    } else {
-        next('/login');
-    }
-});*/
-
-
 
 const routes = [
   {
@@ -35,7 +25,8 @@ const routes = [
     name: 'Login',
     component: Login, 
     beforeEnter: (to, from, next) => { 
-      delete localStorage.token;
+      delete localStorage.user;
+      delete localStorage.admin;
       next();  
     } 
   },
@@ -44,7 +35,7 @@ const routes = [
     name: 'Register',
     component: Register, 
     beforeEnter: (to, from, next) => { 
-      delete localStorage.token;
+      delete localStorage.user;
       next();  
     } 
   },
@@ -75,4 +66,12 @@ const router = new VueRouter({
   routes
 })
 
+
+router.beforeEach((to, from, next) => {
+    if (to.path != '/login' && !existUser()) {
+        next({ path : '/login' });
+    } else {
+        next();
+    }
+});
 export default router

@@ -10,6 +10,7 @@ const biblioteca = require('./backend/sql/biblioteca')
 const nube = require('./backend/sql/nube')
 const usuarios = require('./backend/sql/usuarios')
 const juegos = require('./backend/sql/juegos')
+const login = require('./backend/sql/login')
 
 
 const app = express()
@@ -53,6 +54,52 @@ function handleDisconnect() {
 handleDisconnect();
 
 //
+// ────────────────────────────────────────────────────────── I ──────
+// 			      U S U A R I O S
+// ────────────────────────────────────────────────────────────────────
+//
+
+let admin = {valor: 0}
+let user = ""
+
+// Inicio de Sesion
+app.post('/api/login', (req, res) => {
+  console.log(req.body)
+  
+  connection.query(login.iniciar(req.body), function(err, rows, fields) {
+    if (err) {
+      console.log(err)
+      return res.status(412).send("No coinciden las credenciales");
+    }
+    console.log(rows.length)
+    if (rows.length == 1){
+      user = req.body.user
+      admin.valor = 1
+    } else {
+      admin.valor = 0
+    }
+    return res.sendStatus(200)
+  });
+})
+
+app.get('/api/login/:user', (req, res) => {
+  console.log(req.params.user)
+  connection.query(login.admin({
+    user: req.params.user
+  }), function(err, rows, fields) {
+    if (err) {
+      console.log(err)
+      return res.status(412).send("Ya existe un juego con este nombre");
+    }
+    console.log(rows.length)
+    if (rows.length == 1){
+      admin.valor = 2
+    }
+    return res.send(admin)
+  });
+})
+
+//
 // ────────────────────────────────────────────────────────── IV ──────
 // 				J U E G O S
 // ────────────────────────────────────────────────────────────────────
@@ -61,7 +108,7 @@ handleDisconnect();
 // Dar de Alta Juego
 app.post('/api/juegos/alta', (req, res) => {
   connection.query(juegos.darAlta(req.body), function(err, rows, fields) {
-  if (err) {
+    if (err) {
       console.log(err)
       return res.status(412).send("Ya existe un juego con este nombre");
     }
