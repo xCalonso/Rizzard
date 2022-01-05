@@ -16,6 +16,7 @@
                              label="Usuario"
                              v-model="R_13.user"
                              type="text"
+                             required
                            ></v-text-field>
                            <v-text-field
                              :rules="[field_not_empty]"
@@ -24,6 +25,7 @@
                              label="Contraseña"
                              v-model="R_13.password"
                              type="password"
+                             required
                            ></v-text-field>
                            <v-text-field
                              :rules="[field_not_empty]"
@@ -32,6 +34,7 @@
                              label="Confirmar Contraseña"
                              v-model="R_13.conf_password"
                              type="password"
+                             required
                            ></v-text-field>
                            <input type="checkbox" :checked="admin" v-model="admin">
                              Es una cuenta de administrador
@@ -87,19 +90,17 @@ export default {
         try{
           if (this.admin){
             await axios.post(`${url}/api/register-admin`, this.R_13)   
+            localStorage.setItem('admin', this.R_13.user)
           } else {
             await axios.post(`${url}/api/register`, this.R_13)
           }
+          localStorage.setItem('user', this.R_13.user)
+          this.$router.push({ path: '/'})
+          this.$router.forward()
+          this.$router.go()
         } catch (err) {
           this.error.R_13 = true
         }
-        if (this.admin) {
-          localStorage.setItem('admin', this.R_13.user)
-        }
-        localStorage.setItem('user', this.R_13.user)
-        this.$router.push({ path: '/'})
-        this.$router.forward()
-        this.$router.go()
       } else {
         this.error.R_13 = true
       }
