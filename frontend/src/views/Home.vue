@@ -18,7 +18,7 @@
         </v-layout>
         <v-card-title>Usuarios</v-card-title>
       </v-card>
-      <v-card class="pa-6 mr-3" hover @click="$router.push({ name: 'Juegos' })">
+      <v-card v-if="!!admin" class="pa-6 mr-3" hover @click="$router.push({ name: 'Juegos' })">
         <v-layout justify-center>
           <v-icon size="100" color="black">
             mdi-gamepad-variant
@@ -42,5 +42,15 @@
 
 export default {
   name: 'Home',
+  
+  data: () => ({
+    user: "",
+    admin: "",
+  }),
+  
+  created(){
+    this.user = localStorage.getItem('user')
+    this.admin = localStorage.admin
+  }
 }
 </script>

@@ -1,95 +1,109 @@
 <template>
-  <div>
-    <h4>Register</h4>
-    <form>
-      <label for="name">Name</label>
-      <div>
-        <input id="name" type="text" v-model="name" required autofocus />
-      </div>
-
-      <label for="email">E-Mail Address</label>
-      <div>
-        <input id="email" type="email" v-model="email" required />
-      </div>
-
-      <label for="password">Password</label>
-      <div>
-        <input id="password" type="password" v-model="password" required />
-      </div>
-
-      <label for="password-confirm">Confirm Password</label>
-      <div>
-        <input id="password-confirm" type="password" v-model="password_confirmation" required />
-      </div>
-
-      <label for="password-confirm">Is this an administrator account?</label>
-      <div>
-        <select v-model="is_admin">
-          <option value=1>Yes</option>
-          <option value=0>No</option>
-        </select>
-      </div>
-
-      <div>
-        <button type="submit" @click="handleSubmit">
-          Register
-        </button>
-      </div>
-    </form>
+  <div id="register">
+    <v-content>
+         <v-container fluid fill-height>
+            <v-layout align-center justify-center>
+               <v-flex xs12 sm8 md4>
+                  <v-card class="elevation-12">
+                     <v-toolbar dark color="primary">
+                        <v-toolbar-title>Sign up</v-toolbar-title>
+                     </v-toolbar>
+                     <v-card-text>
+                        <v-form>
+                           <v-text-field
+                             :rules="[field_not_empty]"
+                             name="username"
+                             label="Usuario"
+                             v-model="R_13.user"
+                             type="text"
+                           ></v-text-field>
+                           <v-text-field
+                             :rules="[field_not_empty]"
+                             id="password"
+                             name="password"
+                             label="Contraseña"
+                             v-model="R_13.password"
+                             type="password"
+                           ></v-text-field>
+                           <v-text-field
+                             :rules="[field_not_empty]"
+                             id="password"
+                             name="conf_password"
+                             label="Confirmar Contraseña"
+                             v-model="R_13.conf_password"
+                             type="password"
+                           ></v-text-field>
+                           <input type="checkbox" :checked="admin" v-model="admin">
+                             Es una cuenta de administrador
+                        </v-form>
+                     </v-card-text>
+                     <v-card-actions>
+                       <v-btn @click="$router.push({path: '/login'})" color="primary">Login</v-btn>
+                       <v-spacer></v-spacer>
+                       <v-btn @click="SignUp" color="primary">Sign up</v-btn>
+                     </v-card-actions>
+                  </v-card>
+               </v-flex>
+            </v-layout>
+         </v-container>
+      </v-content>
+      <v-alert v-if="error.R_13" text type="error">Compruebe que ha introducido correctamente sus datos.</v-alert>
+     
   </div>
 </template>
 
 
-...
+
 <script>
+import axios from 'axios'
+const url = 'http://localhost:8080'
+//const url = 'https://rizzard-x.herokuapp.com'
+
 export default {
-  props: ["nextUrl"],
-  data () {
-    return {
-      name : "",
-      email : "",
-      password : "",
-      password_confirmation : "",
-      is_admin : null
-    }
-  },
+  data: () => ({
+    R_13: {
+      user: "",
+      password: "",
+      conf_password: "",
+    },
+    
+    admin: false,
+    
+    success: {
+    },
+    
+    error: {
+      R_13: false,
+    },
+    
+    field_not_empty   : (str)   => (str) ? true  : "El campo no puede estar vacío",
+  }),
+  
   methods: {
-    handleSubmit(e) {
-      e.preventDefault()
-
-      if (this.password === this.password_confirmation && this.password.length > 0) {
-        let url = "http://localhost:8080/register"
-
-        if (this.is_admin != null || this.is_admin == 1) url = "http://localhost:3000/register-admin"
-
-        this.$http.post(url, {
-          name: this.name,
-          email: this.email,
-          password: this.password,
-          is_admin: this.is_admin
-        })
-          .then(response => {
-            localStorage.setItem('user', JSON.stringify(response.data.user))
-            localStorage.setItem('jwt',response.data.token)
-
-            if (localStorage.getItem('jwt') != null) {
-              this.$emit('loggedIn')
-              if (this.$route.params.nextUrl != null) {
-                this.$router.push(this.$route.params.nextUrl)
-              } else {
-                this.$router.push('/')
-              }
-            }
-          })
-          .catch(error => {
-            console.error(error);
-          });
+     async SignUp(){
+      this.error.R_13 = false
+      
+      if (this.password == this.conf_password){
+        try{
+          if (this.admin){
+            await axios.post(`${url}/api/register-admin`, this.R_13)   
+          } else {
+            await axios.post(`${url}/api/register`, this.R_13)
+          }
+        } catch (err) {
+          this.error.R_13 = true
+        }
+        if (this.admin) {
+          localStorage.setItem('admin', this.R_13.user)
+        }
+        localStorage.setItem('user', this.R_13.user)
+        this.$router.push({ path: '/'})
+        this.$router.forward()
+        this.$router.go()
       } else {
-        this.password = ""
-        this.passwordConfirm = ""
-
-        return alert("Passwords do not match")
+        this.error.R_13 = true
       }
-    }
+    },
   }
 }
+</script>

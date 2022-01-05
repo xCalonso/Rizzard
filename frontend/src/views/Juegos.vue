@@ -12,7 +12,7 @@
         </div>
         <v-alert v-if="success.DAJ_19" text type="success" >El juego ha sido dado de alto con éxito</v-alert>
         <v-alert v-if="error.DAJ_19" text type="error">Ha ocurrido un error. Comprueba que los campos anteriores son correctos.</v-alert>
-        <v-btn @click="DarAltaJuego" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">Dar de alta</v-btn>
+        <v-btn @click="DarAltaJuego" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">DAR DE ALTA</v-btn>
         
         
         <div class="display-1 font-weight-bold mt-6 mb-2">Dar de Baja Juego (20)</div>
@@ -21,12 +21,12 @@
         </div>
         <v-alert v-if="success.DBJ_20" text type="success" >El juego ha sido dado de baja con éxito</v-alert>
         <v-alert v-if="error.DBJ_20" text type="error">Ha ocurrido un error. Comprueba que los campos anteriores son correctos.</v-alert>
-        <v-btn @click="DarBajaJuego" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">Dar de baja</v-btn>
+        <v-btn @click="DarBajaJuego" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">DAR DE BAJA</v-btn>
         
         
         <div class="display-1 font-weight-bold mt-6 mb-2">Listar Juegos (21)</div>
         <v-alert v-if="error.LJ_21" text type="error">Ha ocurrido un error. No existen juegos en la Base de Datos.</v-alert>
-        <v-btn @click="ListarJuegos" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">ListarJuegos</v-btn>
+        <v-btn @click="ListarJuegos" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">LISTARJUEGOS</v-btn>
         
       <v-simple-table v-if="lista">
         <thead>

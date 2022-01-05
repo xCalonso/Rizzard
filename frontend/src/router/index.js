@@ -32,7 +32,7 @@ const routes = [
   },
   {
     path: '/register', 
-    name: 'Register',
+    name: 'Sign up',
     component: Register, 
     beforeEnter: (to, from, next) => { 
       delete localStorage.user;
@@ -68,10 +68,12 @@ const router = new VueRouter({
 
 
 router.beforeEach((to, from, next) => {
-    if (to.path != '/login' && !existUser()) {
-        next({ path : '/login' });
+    if (to.path == '/register') {
+      next();
+    } else if (to.path != '/login' && !existUser()) {
+      next({ path : '/login' });
     } else {
-        next();
+      next();
     }
 });
 export default router

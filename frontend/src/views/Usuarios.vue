@@ -11,7 +11,7 @@
       
       <div class="display-1 font-weight-bold mt-6 mb-2">Borrar Amigo (18)</div>
       <div style="max-width: 900px; margin: 0 auto">
-          <v-text-field :rules="[field_not_empty]" v-model="AA_17.n_amigo" placeholder="Nombre de Usuario" outlined></v-text-field>
+          <v-text-field :rules="[field_not_empty]" v-model="EA_18.n_amigo" placeholder="Nombre de Usuario" outlined></v-text-field>
       </div>
       <v-alert v-if="success.EA_18" text type="success" >Se ha borrado de la lista de amigos correctamente.</v-alert>
       <v-alert v-if="error.EA_18" text type="error">Ha ocurrido un error. Comprueba que los campos anteriores son correctos.</v-alert>
@@ -31,7 +31,8 @@
 
 <script>
 import axios from 'axios'
-const url = 'https://rizzard-x.herokuapp.com/#'
+const url = 'http://localhost:8080'
+//const url = 'https://rizzard-x.herokuapp.com'
 
 export default {
   data: () => ({    
@@ -57,7 +58,7 @@ export default {
       EA_18: false,
     },
   
-    field_not_empty   : (str)   => (str) ? true  : "El campo no puede ser vacío",
+    field_not_empty   : (str)   => (str) ? true  : "El campo no puede estar vacío",
     precio_positivo   : (value) => value > 0 ? true: "El precio debe ser positivo",
     unidades_positivas: (value) => value > 0 ? true: "El número de unidades debe ser positivo",
   }),
@@ -68,7 +69,7 @@ export default {
       this.error.AA_17 = false
       
       try{
-        await axios.put(`${url}/api/juegos/${this.DBJ_20.n_juego}` , this.AA_17)
+        await axios.put(`${url}/api/usuarios/agregar/${this.AA_17.n_amigo}`, this.AA_17)
         this.success.AA_17 = true
       } catch (err) {
         this.error.AA_17 = true
@@ -80,6 +81,7 @@ export default {
       this.error.EA_18 = false
       
       try{
+        await axios.put(`${url}/api/usuarios/borrar/${this.EA_18.n_amigo}`, this.EA_18)
         this.success.EA_18 = true
       } catch (err) {
         this.error.EA_18 = true
@@ -91,9 +93,16 @@ export default {
       this.error.EC_14 = false
       
       try{
+        await axios.put(`${url}/usuarios/eliminar/${this.EC_14.pass}`, this.EC_14)
         this.success.EC_14 = true
       } catch (err) {
         this.error.EC_14 = true
+      }
+      
+      if (this.success.EC_14){
+        this.$router.push({ path: '/login'})
+        this.$router.forward()
+        this.$router.go()
       }
     },
   }

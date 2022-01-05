@@ -22,7 +22,8 @@ CREATE TABLE Partida(
 	horaGuardado  TIME,
 	horasJugadas	int,
 	estadoMaquina  varchar(500),
-	nombreJuego varchar(30) REFERENCES Juego (nombreJuego)
+	nombreJuego varchar(30) REFERENCES Juego (nombreJuego),
+	Creador varchar(20) REFERENCES Usuario (nombreUsuario)
 );
 
 CREATE TABLE Amigos(

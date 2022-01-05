@@ -11,4 +11,12 @@ let listar = function({consulta}){
   return `SELECT * FROM Juego`
 }
 
-module.exports = {darAlta, darBaja, listar}
+let comprobar = function({n_juego}){
+  return `SELECT * FROM Juego WHERE nombreJuego='${n_juego}'`
+}
+
+let precio = function({n_juego}){
+  return `SELECT Precio FROM Juego WHERE nombreJuego='${n_juego}'`
+}
+
+module.exports = {darAlta, darBaja, listar, comprobar, precio}

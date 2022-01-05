@@ -37,18 +37,27 @@
     
     <v-main>
       <v-toolbar style="position: sticky; top: 0; z-index: 20" color="primary" dark flat>
-        <v-btn v-if="$route.name != 'Home' && $route.name != 'Login' && $route.name != 'Register'" class="mx-1" icon dark @click="$router.push({path: '/'})">
+        <v-btn v-if="$route.name != 'Home' && $route.name != 'Login' && $route.name != 'Sign up'" class="mx-1" icon dark @click="$router.back()">
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>      
         <h2>{{$route.name}}</h2>
-        <v-btn v-if="$route.name != '/Login' && $route.name != 'Register'" @click="$router.push({path: '/login'}); $router.go()" color="secondary" :style="{left: '92%', transform:'translateX(-50%)'}">Logout</v-btn>
+        
+        
+        
+        <v-spacer></v-spacer>
+        <v-btn v-if="$route.name != 'Login' && $route.name != 'Sign up'" @click="Logout" color="secondary">Logout</v-btn>
+        
       </v-toolbar>
       <router-view class="ma-6"></router-view>
+      <v-btn v-if="$route.path == '/reset' && !!admin" @click="Reset" color="secondary" :style="{left: '50%', transform:'translateX(-50%)'}">Reset</v-btn>
     </v-main>
   </v-app>
 </template>
 
 <script>
+import axios from 'axios'
+const url = 'http://localhost:8080'
+//const url = 'https://rizzard-x.herokuapp.com'
 
 export default {
   name: 'App',
@@ -60,16 +69,55 @@ export default {
   data: () => ({
     user: "",
     admin: "",
+
+    comprobar: false,
+
+    logout: {
+      user: "",
+      hora_fin: "",
+    }
   }),
   
   created(){
     this.user = localStorage.getItem('user')
     this.admin = localStorage.admin
+
+    if (localStorage.getItem('user'))
+      this.ComprobarUser()
   },
+  
   computed:{
     theme(){
       return (this.$vuetify.theme.dark) ? 'dark' : 'light'
     }
+  },
+
+  methods: {
+    async Logout() {
+      try{
+        this.logout.hora_fin = new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes() + ':' + new Date(Date.now()).getSeconds()
+        this.logout.user = this.user
+        await axios.post(`${url}/api/login/logout`, this.logout)
+        this.$router.push({path: '/login'})
+        this.$router.forward()
+        this.$router.go()
+      } catch (err){
+        console.log(err)
+      }
+    },
+
+    async ComprobarUser(){
+      try {
+        this.comprobar = (await axios.get(`${url}/api/login/comprobar/${this.user}`, this.user)).data.buena
+        if (!this.comprobar){
+          this.$router.push({path: '/login'})
+          this.$router.forward()
+          this.$router.go()
+        }
+      } catch (err){
+        console.log(err)
+      }
+    } 
   }
 };
 </script>

@@ -11,21 +11,24 @@
                      <v-card-text>
                         <v-form>
                            <v-text-field
-                              name="login"
-                              label="Login"
-                              v-model="IS_15.user"
-                              type="text"
+                             :rules="[field_not_empty]"
+                             name="login"
+                             label="Usuario"
+                             v-model="IS_15.user"
+                             type="text"
                            ></v-text-field>
                            <v-text-field
-                              id="password"
-                              name="password"
-                              label="Password"
-                              v-model="IS_15.password"
-                              type="password"
+                             :rules="[field_not_empty]"
+                             id="password"
+                             name="password"
+                             label="Contraseña"
+                             v-model="IS_15.password"
+                             type="password"
                            ></v-text-field>
                         </v-form>
                      </v-card-text>
                      <v-card-actions>
+                        <v-btn @click="$router.push({path: '/register'})" color="primary">Sign up</v-btn>
                         <v-spacer></v-spacer>
                         <v-btn @click="InicioSesion" color="primary">Login</v-btn>
                      </v-card-actions>
@@ -50,10 +53,12 @@ export default {
   data: () => ({
     IS_15: {
       user: "",
-      password: ""
+      password: "",
+      fecha: (new Date(Date.now())).toISOString().substr(0, 10),
+      hora_inicio: new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes() + ':' + new Date(Date.now()).getSeconds(),
     },
     
-    logeado: null,
+    logeado: 0,
     
     success: {
     },
@@ -61,6 +66,8 @@ export default {
     error: {
       IS_15: false,
     },
+    
+    field_not_empty   : (str)   => (str) ? true  : "El campo no puede estar vacío",
   }),
   
   methods: {
