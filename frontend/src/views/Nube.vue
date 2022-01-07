@@ -37,8 +37,8 @@
 // <v-row justify="space-around" align="center"><v-date-picker v-model="SP_10.fecha"></v-date-picker><v-time-picker v-model="SP_10.hora_guardado" use-seconds></v-time-picker></v-row>
 
 import axios from 'axios'
-const url = 'http://localhost:8080'
-//const url = 'https://rizzard-x.herokuapp.com/'
+//const url = 'http://localhost:8080'
+const url = 'https://rizzard-x.herokuapp.com/'
 
 export default {
   data: () => ({
