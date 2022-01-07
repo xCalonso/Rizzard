@@ -33,7 +33,7 @@ app.use(bodyParser.urlencoded({
 const mysql = require('mysql');
 var connection
 function handleDisconnect() {
-  connection = mysql.createConnection('mysql://b4cc23020ae5c0:62dacd4c@eu-cdbr-west-02.cleardb.net/heroku_512342ab1505158?reconnect=true?multipleStatements=true');
+  connection = mysql.createConnection('mysql://b4cc23020ae5c0:62dacd4c@eu-cdbr-west-02.cleardb.net/heroku_512342ab1505158?reconnect=true');
   connection.connect(function(err) {              // The server is either down
     if(err) {                                     // or restarting (takes a while sometimes).
       console.log('error when connecting to db:', err);
@@ -429,7 +429,7 @@ app.post('/api/biblioteca/instalar', (req, res) => {
           return res.status(500).send("No se ha podido iniciar la transacción")
         }
 
-        connection.query(biblioteca.actualizarJuego({
+        connection.query(biblioteca.instalarJuego({
           n_juego: req.body.n_juego,
           n_usuario: user,
           directorio: req.body.directorio
