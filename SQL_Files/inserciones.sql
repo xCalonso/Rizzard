@@ -1,8 +1,8 @@
 INSERT INTO Usuario (nombreUsuario, Correo, Passwd, Puntos) VALUES
-	('Pablo', 'correoP@gmail.com', '123456', 100),
-	('Carlos', 'correoC@gmail.com', '123456', 10),
-	('Bece', 'correoB@gmail.com', '123456', 100),
-	('Javi', 'correoJ@gmail.com', '123456', 100),
+	('Pablo', 'correoP@gmail.com', '123456', 3000),
+	('Carlos', 'correoC@gmail.com', '123456', 200),
+	('Bece', 'correoB@gmail.com', '123456', 2000),
+	('Javi', 'correoJ@gmail.com', '123456', 2000),
 	('Mateos', 'correoM@gmail.com', '123456', 0);
 
 INSERT INTO Juego (nombreJuego, Categoria, Pegi, Instalador, nivelesRecompensa, Licencia, Precio, Estado) VALUES

@@ -31,7 +31,7 @@ let modificarCompartidos = function({estado, n_juego, num_copia}){
 }
 
 let actualizarJuego = function({n_juego, n_usuario, directorio, version}){
-  return `UPDATE CopiaJuego SET Estado='jugable', directorioInstalacion='${directorio}', Version='${version}' WHERE nombreJuego='${n_juego}' AND nombreUsuario='${n_usuario}'`
+  return `UPDATE CopiaJuego SET Estado='jugable', directorioInstalacion='${directorio}', Version=${version} WHERE nombreJuego='${n_juego}' AND nombreUsuario='${n_usuario}'`
 }
 
 let instalarJuego = function({n_juego, n_usuario, directorio}){
@@ -40,6 +40,10 @@ let instalarJuego = function({n_juego, n_usuario, directorio}){
 
 let desinstalarJuego = function({n_juego, n_usuario}){
   return `UPDATE CopiaJuego SET Estado='instalable' WHERE nombreJuego='${n_juego}' AND nombreUsuario='${n_usuario}'`
+}
+
+let comprobarEstado = function({n_juego, n_usuario}){
+  return `SELECT * FROM CopiaJuego WHERE nombreUsuario='${n_usuario}' AND nombreJuego='${n_juego}'`
 }
 
 let comprobarCompartida = function({n_usuario, n_amigo}){
@@ -62,4 +66,4 @@ let finalizarJuego = function({n_juego, n_usuario}){
   return `UPDATE CopiaJuego SET Estado='jugable' WHERE nombreJuego='${n_juego}' AND nombreUsuario='${n_usuario}'`
 }
 
-module.exports = {comprarJuego, lastID, devolverJuego, comprobar, obtenerCompartidos, modificarCompartidos, quitarCopiasCompartidas, quitarCompartidos, actualizarJuego, instalarJuego, desinstalarJuego, comprobarCompartida, dejarCompartirBiblioteca, compartirBiblioteca, lanzarJuego, finalizarJuego}
+module.exports = {comprarJuego, lastID, devolverJuego, comprobar, obtenerCompartidos, modificarCompartidos, quitarCopiasCompartidas, quitarCompartidos, comprobarEstado, actualizarJuego, instalarJuego, desinstalarJuego, comprobarCompartida, dejarCompartirBiblioteca, compartirBiblioteca, lanzarJuego, finalizarJuego}

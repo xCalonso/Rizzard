@@ -33,7 +33,7 @@ app.use(bodyParser.urlencoded({
 const mysql = require('mysql');
 var connection
 function handleDisconnect() {
-  connection = mysql.createConnection('mysql://b4cc23020ae5c0:62dacd4c@eu-cdbr-west-02.cleardb.net/heroku_512342ab1505158?reconnect=true');
+  connection = mysql.createConnection('mysql://b4cc23020ae5c0:62dacd4c@eu-cdbr-west-02.cleardb.net/heroku_512342ab1505158?reconnect=true?multipleStatements=true');
   connection.connect(function(err) {              // The server is either down
     if(err) {                                     // or restarting (takes a while sometimes).
       console.log('error when connecting to db:', err);
@@ -208,7 +208,7 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
     } else if (rows.length != 1){
       return res.status(500).send("El juego no está en la base de datos")
     }
-    let puntos = rows[0].Precio
+    let precio = rows[0].Precio
 
     connection.query(biblioteca.comprobar({
       n_juego: req.params.n_juego,
@@ -220,7 +220,8 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
       } else if (rows.length != 1){
         return res.status(500).send("El juego no fue comprado por el usuario")
       }
-      let puntos_compra = (rows[0].Precio - req.body.puntos/100)*10
+      let puntos_compra = (precio - rows[0].puntosGastados/100)*10
+      console.log(puntos_compra)
 
       connection.query(usuarios.comprobarPuntos({
         n_usuario: user
@@ -231,7 +232,8 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
         } else if (rows[0].Puntos < puntos_compra){
           return res.status(500).send("No son suficientes los puntos del usuario")
         }
-        let puntos = rows[0].Puntos - puntos_compra 
+        let puntos_user = rows[0].Puntos - puntos_compra 
+        console.log(puntos)
 
         connection.beginTransaction(function(err){
           if (err){
@@ -239,7 +241,7 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
           }
 
           connection.query(usuarios.editarPuntos({
-            puntos: puntos,
+            puntos: puntos_user,
             n_usuario: user,
           }), function(err, rows, fields) {
             if (err){
