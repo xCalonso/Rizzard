@@ -18,8 +18,28 @@ let editarPuntos = function({puntos, n_usuario}){
   return `UPDATE Usuario SET Puntos=${puntos} WHERE nombreUsuario='${n_usuario}'`
 }
 
-let sesion = function({n_usuario, fecha, hora_inicio, hora_fin}){
-  return `INSERT INTO Sesion (nombreUsuario, Fecha, horaInicio, horaFin) VALUES ('${n_usuario}', '${fecha}', '${hora_inicio}', '${hora_fin}')`
+let sesion = function({n_usuario, fecha_inicio, fecha_fin, hora_inicio, hora_fin}){
+  return `INSERT INTO Sesion (nombreUsuario, fechaInicio, fechaFin, horaInicio, horaFin) VALUES ('${n_usuario}', '${fecha_inicio}', '${fecha_fin}', '${hora_inicio}', '${hora_fin}')`
 }
 
-module.exports = {sonAmigos, añadirAmigo, eliminarAmigo, comprobarPuntos, editarPuntos, sesion}
+let eliminado = function({n_usuario}){
+  return `SELECT * FROM UsuarioEliminado WHERE nombreUsuario='${n_usuario}'`
+}
+
+let habilitar = function({n_usuario}){
+  return `DELETE FROM UsuarioEliminado WHERE nombreUsuario='${n_usuario}'`
+}
+
+let setAdministrador = function({n_usuario}){
+  return `INSERT INTO Administrador (nombreUsuario, idAdmin) VALUES ('${n_usuario}', 'admin')`
+}
+
+let modificarPass = function({n_usuario, password}){
+  return `UPDATE Usuario SET Passwd='${password}' WHERE nombreUsuario='${n_usuario}'`
+}
+
+let eliminarCuenta = function({n_usuario, fecha}){
+  return `INSERT INTO UsuarioEliminado (nombreUsuario, Fecha) VALUES ('${n_usuario}', '${fecha}')`
+}
+
+module.exports = {sonAmigos, añadirAmigo, eliminarAmigo, comprobarPuntos, editarPuntos, sesion, eliminado, habilitar, setAdministrador, modificarPass, eliminarCuenta}

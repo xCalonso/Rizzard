@@ -38,6 +38,8 @@ export default {
   data: () => ({    
     EC_14: {
       pass: "",
+      fecha: "",
+      hora: ""
     },    
     AA_17: {
       n_amigo: "",
@@ -93,7 +95,9 @@ export default {
       this.error.EC_14 = false
       
       try{
-        await axios.put(`${url}/usuarios/eliminar/${this.EC_14.pass}`, this.EC_14)
+        this.EC_14.fecha = (new Date(Date.now())).toISOString().substr(0, 10)
+        this.EC_14.hora = new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes() + ':' + new Date(Date.now()).getSeconds()
+        await axios.post(`${url}/usuarios/eliminar`, this.EC_14)
         this.success.EC_14 = true
       } catch (err) {
         this.error.EC_14 = true

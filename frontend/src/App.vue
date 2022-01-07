@@ -70,10 +70,11 @@ export default {
     user: "",
     admin: "",
 
-    comprobar: false,
+    buena:false,
 
     logout: {
       user: "",
+      fecha_fin: "",
       hora_fin: "",
     }
   }),
@@ -82,7 +83,7 @@ export default {
     this.user = localStorage.getItem('user')
     this.admin = localStorage.admin
 
-    if (localStorage.getItem('user'))
+    if (this.user)
       this.ComprobarUser()
   },
   
@@ -95,6 +96,7 @@ export default {
   methods: {
     async Logout() {
       try{
+        this.logout.fecha_fin = (new Date(Date.now())).toISOString().substr(0, 10)
         this.logout.hora_fin = new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes() + ':' + new Date(Date.now()).getSeconds()
         this.logout.user = this.user
         await axios.post(`${url}/api/login/logout`, this.logout)
@@ -108,8 +110,8 @@ export default {
 
     async ComprobarUser(){
       try {
-        this.comprobar = (await axios.get(`${url}/api/login/comprobar/${this.user}`, this.user)).data.buena
-        if (!this.comprobar){
+        this.buena = (await axios.get(`${url}/api/login/comprobar/${this.user}`, this.user)).data.buena
+        if (!this.buena){
           this.$router.push({path: '/login'})
           this.$router.forward()
           this.$router.go()

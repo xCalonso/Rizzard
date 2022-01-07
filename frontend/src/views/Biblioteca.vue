@@ -178,7 +178,7 @@ export default {
   }),
   
   methods: {
-    async comprarJuego(){
+    async ComprarJuego(){
       this.success.CJ_1 = false
       this.error.CJ_1 = false
 

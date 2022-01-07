@@ -20,6 +20,14 @@
                            ></v-text-field>
                            <v-text-field
                              :rules="[field_not_empty]"
+                             name="correo"
+                             label="Correo Electrónico"
+                             v-model="R_13.correo"
+                             type="text"
+                             required
+                           ></v-text-field>
+                           <v-text-field
+                             :rules="[field_not_empty]"
                              id="password"
                              name="password"
                              label="Contraseña"
@@ -36,7 +44,7 @@
                              type="password"
                              required
                            ></v-text-field>
-                           <input type="checkbox" :checked="admin" v-model="admin">
+                           <input type="checkbox" :checked="R_13.admin" v-model="R_13.admin">
                              Es una cuenta de administrador
                         </v-form>
                      </v-card-text>
@@ -68,9 +76,9 @@ export default {
       user: "",
       password: "",
       conf_password: "",
+      correo: "",
+      admin: false,
     },
-    
-    admin: false,
     
     success: {
     },
@@ -88,14 +96,8 @@ export default {
       
       if (this.password == this.conf_password){
         try{
-          if (this.admin){
-            await axios.post(`${url}/api/register-admin`, this.R_13)   
-            localStorage.setItem('admin', this.R_13.user)
-          } else {
-            await axios.post(`${url}/api/register`, this.R_13)
-          }
-          localStorage.setItem('user', this.R_13.user)
-          this.$router.push({ path: '/'})
+          await axios.post(`${url}/api/register`, this.R_13)
+          this.$router.push({ path: '/login'})
           this.$router.forward()
           this.$router.go()
         } catch (err) {

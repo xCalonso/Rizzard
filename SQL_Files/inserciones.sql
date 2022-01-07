@@ -53,24 +53,24 @@ INSERT INTO Administrador (nombreUsuario, idAdmin) VALUES
 INSERT INTO UsuarioEliminado (nombreUsuario, Fecha) VALUES
 	('Mateos', CURDATE());
 
-INSERT INTO Sesion (nombreUsuario, Fecha, horaInicio, horaFin) VALUES
-	('Pablo', CURDATE(), '12:23:31', '15:34:12'),
-	('Javi', '2021-12-24', '11:34:12', '12:12:32'),
-	('Carlos', '2021-12-21', '13:12:43', '16:32:52'),
-	('Bece', '2021-12-25', '16:43:32', '18:53:16');
+INSERT INTO Sesion (nombreUsuario, fechaInicio, fechaFin, horaInicio, horaFin) VALUES
+	('Pablo', CURDATE(), CURDATE(), '12:23:31', '15:34:12'),
+	('Javi', '2021-12-24', '2021-12-24', '11:34:12', '12:12:32'),
+	('Carlos', '2021-12-21', '2021-12-22', '22:12:43', '01:32:52'),
+	('Bece', '2021-12-25', '2021-12-25', '16:43:32', '18:53:16');
 
-INSERT INTO CopiaJuego (numCopia, nombreJuego, Version, directorioInstalacion, Estado, nombreUsuario) VALUES
-	(1, 'GTA5', '3.2', 'C:/Usuarios/Pablo/Juegos/GTA5', 'jugable', 'Pablo'),
-	(2, 'GTA5', '3.2', 'C:/Usuarios/Carlos/Juegos/GTA5', 'instalable', 'Carlos'),
-	(1, 'FIFA22', '1.3', 'C:/Usuarios/Bece/Juegos/FIFA22', 'instalable', 'Bece'),
-	(1, 'Battlefield 2042', '2.2', 'C:/Usuarios/Pablo/Juegos/Battlefield2042', 'jugable', 'Pablo'),
-	(1, 'Cyberpunk 2077', '1.0', 'C:/Usuarios/Javi/Juegos/Cyberpunk2077', 'jugable', 'Javi'),
-	(1, 'Far Cry 6', '1.1', 'C:/Usuarios/Carlos/Juegos/Farcry6', 'jugable', 'Javi'),
-	(3, 'GTA5', '3.2', 'C:/Usuarios/Bece/Juegos/GTA5', 'jugable', 'Bece'),
-	(2, 'Battlefield 2042', '2.2', 'C:/Usuarios/Bece/Juegos/Battlefield2042', 'actualizable', 'Bece'),
-	(2, 'FIFA22', '1.3', 'C:/Usuarios/Javi/Juegos/FIFA22', 'actualizable', 'Javi'),
-	(2, 'Cyberpunk 2077', '1.0', 'C:/Usuarios/Bece/Juegos/Cyberpunk2077', 'jugable', 'Bece'),
-	(2, 'Far Cry 6', '1.1', 'C:/Usuarios/Bece/Juegos/Farcry6', 'jugable', 'Bece');
+INSERT INTO CopiaJuego (numCopia, nombreJuego, Version, directorioInstalacion, Estado, nombreUsuario, puntosGastados) VALUES
+	(1, 'GTA5', '3.2', 'C:/Usuarios/Pablo/Juegos/GTA5', 'actualizable', 'Pablo', 500),
+	(2, 'GTA5', '3.2', 'C:/Usuarios/Carlos/Juegos/GTA5', 'instalable', 'Carlos', 100),
+	(1, 'FIFA22', '1.3', 'C:/Usuarios/Bece/Juegos/FIFA22', 'instalable', 'Bece', 0),
+	(1, 'Battlefield 2042', '2.2', 'C:/Usuarios/Pablo/Juegos/Battlefield2042', 'jugable', 'Pablo', 200),
+	(1, 'Cyberpunk 2077', '1.0', 'C:/Usuarios/Javi/Juegos/Cyberpunk2077', 'jugable', 'Javi', 0),
+	(1, 'Far Cry 6', '1.1', 'C:/Usuarios/Carlos/Juegos/Farcry6', 'jugable', 'Javi', 1000),
+	(3, 'GTA5', '3.2', 'C:/Usuarios/Bece/Juegos/GTA5', 'jugable', 'Bece', 0),
+	(2, 'Battlefield 2042', '2.2', 'C:/Usuarios/Bece/Juegos/Battlefield2042', 'jugable', 'Bece', 0),
+	(2, 'FIFA22', '1.3', 'C:/Usuarios/Javi/Juegos/FIFA22', 'jugable', 'Javi', 0),
+	(2, 'Cyberpunk 2077', '1.0', 'C:/Usuarios/Bece/Juegos/Cyberpunk2077', 'jugable', 'Bece', 0),
+	(2, 'Far Cry 6', '1.1', 'C:/Usuarios/Bece/Juegos/Farcry6', 'jugable', 'Bece', 0);
 
 INSERT INTO JuegoCompartido (numCopia, nombreJuego, nombreAmigo) VALUES
 	(3, 'GTA5', 'Pablo'),

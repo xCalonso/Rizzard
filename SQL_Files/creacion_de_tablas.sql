@@ -58,10 +58,11 @@ CREATE TABLE UsuarioEliminado(
 
 CREATE TABLE Sesion(
 	nombreUsuario varchar(20) REFERENCES Usuario (nombreUsuario),
-	Fecha DATE,
+	fechaInicio DATE,
+	fechaFin DATE,
 	horaInicio TIME,
 	horaFin TIME,
-	PRIMARY KEY (nombreUsuario, Fecha, horaInicio)
+	PRIMARY KEY (nombreUsuario, fechaInicio, fechaFin, horaInicio)
 );
 
 CREATE TABLE CopiaJuego(
@@ -71,6 +72,7 @@ CREATE TABLE CopiaJuego(
 	directorioInstalacion varchar(40),
 	Estado varchar(20),
 	nombreUsuario varchar(20) REFERENCES Usuario (nombreUsuario),
+	puntosGastados int,
 	PRIMARY KEY (numCopia, nombreJuego)
 );
 

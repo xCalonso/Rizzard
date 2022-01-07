@@ -27,25 +27,6 @@ BEGIN
 END;
 
 
-
--- Puntos insuficientes para devolver juego
-
-CREATE OR REPLACE TRIGGER noPuntosDevolverJuego
-	BEFORE
-	DELETE ON CopiaJuego
-	FOR EACH ROW
-DECLARE
-	puntos_usr INT;
-	puntos_jgo INT;
-BEGIN
-	SELECT Puntos INTO puntos_usr FROM Usuario WHERE nombreUsuario = :old.nombreUsuario;
-	SELECT Precio INTO puntos_jgo FROM Juego WHERE nombreJuego = :old.nombreJuego;
-	IF (puntos_usr < puntos_jgo*100) THEN
-		raise_application_error(-20600, :old.nombreJuego || ' no dispone de puntos suficientes para devolver el juego ');
-	END IF;
-END;
-
-
 -- Biblioteca solo se puede compartir con un máximo de 5 amigos
 
 CREATE OR REPLACE TRIGGER maxCompartido
@@ -109,7 +90,7 @@ END;
 
 -- Eliminar amigo que no es tu amigo
 
-CREATE OR REPLACE TRIGGER amigoEliminar
+CREATE OR REPLACE TRIGGER amigoExistente
 	BEFORE
 	DELETE ON Amigos
 	FOR EACH ROW
@@ -157,9 +138,42 @@ BEGIN
 	END IF;
 END;
 
+-- Reembolsar puntos por devolucion de juego y comprobar que tenga suficientes puntos para devolver el juego	
+
+CREATE OR REPLACE TRIGGER devolverJuego
+	BEFORE
+	DELETE ON CopiaJuego
+	FOR EACH ROW
+DECLARE
+	puntos_usr INT;
+	puntos_jgo INT;
+BEGIN
+	SELECT Puntos INTO puntos_usr FROM Usuario WHERE nombreUsuario = :old.nombreUsuario;
+	SELECT Precio INTO puntos_jgo FROM Juego WHERE nombreJuego = :old.nombreJuego;
+	IF (puntos_usr + :old.puntosGastados < puntos_jgo*10) THEN
+		raise_application_error(-20600, :old.nombreJuego || ' no dispone de puntos suficientes para devolver el juego ');
+	ELSE UPDATE Usuario SET Puntos = Puntos + :old.puntosGastados WHERE nombreUsuario = :old.nombreUsuario;
+	END IF;
+END;
 
 
 
+-- Puntos insuficientes para devolver juego
+
+CREATE OR REPLACE TRIGGER noPuntosDevolverJuego
+	BEFORE
+	DELETE ON CopiaJuego
+	FOR EACH ROW
+DECLARE
+	puntos_usr INT;
+	puntos_jgo INT;
+BEGIN
+	SELECT Puntos INTO puntos_usr FROM Usuario WHERE nombreUsuario = :old.nombreUsuario;
+	SELECT Precio INTO puntos_jgo FROM Juego WHERE nombreJuego = :old.nombreJuego;
+	IF (puntos_usr < puntos_jgo*100) THEN
+		raise_application_error(-20600, :old.nombreJuego || ' no dispone de puntos suficientes para devolver el juego ');
+	END IF;
+END;
 
 
 
