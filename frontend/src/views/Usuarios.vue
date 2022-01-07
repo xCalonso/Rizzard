@@ -20,7 +20,7 @@
 
       <div class="display-1 font-weight-bold mt-6 mb-2">Eliminar Cuenta (14)</div>
       <div style="max-width: 900px; margin: 0 auto">
-            <v-text-field :rules="[field_not_empty]" v-model="EC_14.pass" placeholder="Contraseña" outlined></v-text-field>
+            <v-text-field :rules="[field_not_empty]" type="password" v-model="EC_14.pass" placeholder="Contraseña" outlined></v-text-field>
       </div>
       <v-alert v-if="success.EC_17" text type="success" >Se ha borrado la cuenta con éxito, volviendo a la página principal.</v-alert>
       <v-alert v-if="error.EC_17" text type="error">Ha ocurrido un error. Comprueba que los campos anteriores son correctos.</v-alert>

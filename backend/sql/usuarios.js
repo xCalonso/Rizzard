@@ -34,12 +34,12 @@ let setAdministrador = function({n_usuario}){
   return `INSERT INTO Administrador (nombreUsuario, idAdmin) VALUES ('${n_usuario}', 'admin')`
 }
 
-let modificarPass = function({n_usuario, password}){
-  return `UPDATE Usuario SET Passwd='${password}' WHERE nombreUsuario='${n_usuario}'`
+let modificarUsuario = function({n_usuario}){
+  return `UPDATE Usuario SET nombreUsuario='cuenta_eliminada_${n_usuario}' WHERE nombreUsuario='${n_usuario}'`
 }
 
 let eliminarCuenta = function({n_usuario, fecha}){
   return `INSERT INTO UsuarioEliminado (nombreUsuario, Fecha) VALUES ('${n_usuario}', '${fecha}')`
 }
 
-module.exports = {sonAmigos, añadirAmigo, eliminarAmigo, comprobarPuntos, editarPuntos, sesion, eliminado, habilitar, setAdministrador, modificarPass, eliminarCuenta}
+module.exports = {sonAmigos, añadirAmigo, eliminarAmigo, comprobarPuntos, editarPuntos, sesion, eliminado, habilitar, setAdministrador, modificarUsuario, eliminarCuenta}

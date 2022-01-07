@@ -1,5 +1,37 @@
 <template>
     <div id="biblioteca">
+        <div class="display-1 font-weight-bold mt-6 mb-2"> Listar Juegos Disponibles</div>
+        <v-alert v-if="error.CJ" text type="error">Ha ocurrido un error. Comprueba que los campos anteriores son correctos.</v-alert>
+        <v-btn @click="JuegosComprar" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">LISTAR JUEGOS</v-btn>
+
+        <v-simple-table v-if="lista">
+          <thead>
+            <tr>
+              <th class="text-left">
+                nombreJuego
+              </th>
+              <th class="text-left">
+                Categoria
+              </th>
+              <th class="text-left">
+                Pegi
+              </th>
+              <th class="text-left">
+                Precio
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="value in lista" :key="value">
+              <td v-if="value.Estado.data == 1">{{value.nombreJuego}}</td> 
+              <td v-if="value.Estado.data == 1">{{value.Categoria}}</td>
+              <td v-if="value.Estado.data == 1">{{value.Pegi}}</td>
+              <td v-if="value.Estado.data == 1">{{value.Precio}}</td>
+            </tr>
+          </tbody>
+        </v-simple-table>
+
+
         <div class="display-1 font-weight-bold mt-6 mb-2"> Comprar Juego (1)</div>
         <div style="max-width: 900px; margin: 0 auto">
             <v-text-field :rules="[field_not_empty]" v-model="CJ_1.nombre" placeholder="Nombre" outlined required></v-text-field>
@@ -101,6 +133,9 @@ const url = 'https://rizzard-x.herokuapp.com'
 
 export default {
   data: () => ({
+    lista: null,
+    consulta: null,
+
     CJ_1: {
       n_juego: "",
       nombre: "",
@@ -160,6 +195,7 @@ export default {
     },
     
     error: {
+      JC: false,
       CJ_1: false,
       DJ_2: false,
       AJ_3: false,
@@ -178,6 +214,17 @@ export default {
   }),
   
   methods: {
+    async JuegosComprar(){
+      this.error.JC = false
+      this.consulta = 0
+      
+      try{
+        this.lista = (await axios.get(`${url}/api/biblioteca/${this.consulta}}`)).data
+      } catch (err) {
+        this.error.JC = true
+      }
+    },
+
     async ComprarJuego(){
       this.success.CJ_1 = false
       this.error.CJ_1 = false

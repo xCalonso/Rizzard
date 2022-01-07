@@ -60,6 +60,20 @@ handleDisconnect();
 // ────────────────────────────────────────────────────────────────────
 //
 
+// Juegos Disponibles
+app.get('/api/biblioteca/:consulta', (req, res) => {
+  connection.query(juegos.listar({
+    consulta: req.params.consulta
+  }), function (err, rows, fields) {
+    if (err){
+      console.log(err)
+      return res.status(404).send("Error en la consulta")
+    }
+    console.log(rows)
+    return res.send(rows)
+  });
+})
+
 // Comprar Juego
 /*
   1. Comprobar que el juego está en la base de datos.
@@ -835,17 +849,55 @@ app.post('/api/nube/subir', (req, res) => {
           })
           return 
         }
-        console.log("TODO sumar puntos")
-      
-        connection.commit(function (err) {
-          if (err) {
-            connection.rollback(function () {
-              res.status(500).send("No se ha podido completar la transacción")
+        
+        if (req.body.estado == 'estado.dat'){
+          connection.query(usuarios.comprobarPuntos({
+            n_usuario: user
+          }), function(err, rows, fields) {
+            if (err){
+              console.log(err)
+              connection.rollback(function () {
+                res.status(500).send("Error en la consulta")
+              })
+              return 
+            }
+            let puntos = rows[0].Puntos + 2000
+
+            connection.query(usuarios.editarPuntos({
+              puntos: puntos,
+              n_usuario: user
+            }), function(err, rows, fields) {
+              if (err){
+                console.log(err)
+                connection.rollback(function () {
+                  res.status(500).send("No se ha podido modificar la tupla")
+                })
+                return 
+              }
+
+              connection.commit(function (err) {
+                if (err) {
+                  connection.rollback(function () {
+                    res.status(500).send("No se ha podido completar la transacción")
+                  })
+                  return
+                }
+                return res.sendStatus(200)
+              })
             })
-            return
-          }
-          return res.sendStatus(200)
-        })
+          })
+        }
+        else{
+          connection.commit(function (err) {
+            if (err) {
+              connection.rollback(function () {
+                res.status(500).send("No se ha podido completar la transacción")
+              })
+              return
+            }
+            return res.sendStatus(200)
+          })
+        }
       })
     })
   })
@@ -1061,122 +1113,58 @@ app.get('/api/login/comprobar/:user', (req, res) => {
 app.post('/api/register', (req, res) =>{
   console.log(req.body)
 
-  connection.query(usuarios.eliminado({
-    n_usuario: req.body.user
+  connection.beginTransaction(function(err) {
+  if (err){
+    return res.status(500).send("No se ha podido iniciar la transacción")
+  }
+  connection.query(login.registrar({
+    n_usuario: req.body.user,
+    correo: req.body.correo,
+    password: req.body.password
   }), function(err, rows, fields) {
     if (err){
       console.log(err)
-      return res.status(500).send("Error en la consulta");
+      connection.rollback(function () {
+        res.status(500).send("No se ha podido insertar la tupla")
+      })
+      return
     }
 
-    connection.beginTransaction(function(err) {
-      if (err){
-        return res.status(500).send("No se ha podido iniciar la transacción")
-      }
-
-      if (rows.length == 1){
-        connection.query(usuarios.habilitar({
-          n_usuario: req.body.user,
-        }), function(err, rows, fields) {
-          if (err){
-            console.log(err)
-            connection.rollback(function () {
-              res.status(500).send("No se ha podido borrar la tupla")
-            })
-            return
-          }
-          
-          connection.query(usuarios.modificarPass({
-            n_usuario: req.body.user,
-            password: req.body.password
-          }), function(err, rows, fields) {
-            if (err){
-              console.log(err)
-              connection.rollback(function () {
-                res.status(500).send("No se ha podido modificar la tupla")
-              })
-              return
-            }
-
-            connection.query(usuarios.sesion({
-              n_usuario: req.body.user,
-              fecha_inicio: fecha_inicio,
-              fecha_fin: req.body.fecha,
-              hora_inicio: hora_inicio,
-              hora_fin: req.body.hora
-            }), function(err, rows, fields) {
-              if (err) {
-                console.log(err)
-                connection.rollback(function () {
-                  res.status(500).send("No se ha podido insertar la tupla")
-                })
-                return
-              }
-              
-              connection.commit(function (err) {
-                if (err) {
-                  connection.rollback(function () {
-                    res.status(500).send("No se ha podido completar la transacción")
-                  })
-                  return
-                }
-                return res.sendStatus(200)
-              })
-            })
+    if (req.body.admin){
+      connection.query(usuarios.setAdministrador({
+        n_usuario: req.body.user
+      }), function(err, rows, fields) {
+        if (err){
+          console.log(err)
+          connection.rollback(function () {
+            res.status(500).send("No se ha podido insertar la tupla")
           })
-        })
-      }
-      else{
-        connection.query(login.registrar({
-          n_usuario: req.body.user,
-          correo: req.body.correo,
-          password: req.body.password
-        }), function(err, rows, fields) {
-          if (err){
-            console.log(err)
+          return
+        }
+        connection.commit(function (err) {
+          if (err) {
             connection.rollback(function () {
-              res.status(500).send("No se ha podido insertar la tupla")
+              res.status(500).send("No se ha podido completar la transacción")
             })
             return
           }
-
-          if (req.body.admin){
-            connection.query(usuarios.setAdministrador({
-              n_usuario: req.body.user
-            }), function(err, rows, fields) {
-              if (err){
-                console.log(err)
-                connection.rollback(function () {
-                  res.status(500).send("No se ha podido insertar la tupla")
-                })
-                return
-              }
-              connection.commit(function (err) {
-                if (err) {
-                  connection.rollback(function () {
-                    res.status(500).send("No se ha podido completar la transacción")
-                  })
-                  return
-                }
-                return res.sendStatus(200)
-              })
-            })
-          }
-          else {
-            connection.commit(function (err) {
-              if (err) {
-                connection.rollback(function () {
-                  res.status(500).send("No se ha podido completar la transacción")
-                })
-                return
-              }
-              return res.sendStatus(200)
-            })
-          }
+          return res.sendStatus(200)
         })
-      }
-    })
+      })
+    }
+    else {
+      connection.commit(function (err) {
+        if (err) {
+          connection.rollback(function () {
+            res.status(500).send("No se ha podido completar la transacción")
+          })
+          return
+        }
+        return res.sendStatus(200)
+      })
+    }
   })
+})
 })
 
 // Eliminar Cuenta
@@ -1191,26 +1179,54 @@ app.post('/usuarios/eliminar', (req, res) => {
       return res.status(500).send("No se ha podido iniciar la transacción")
     }
 
-    connection.query(usuarios.eliminarCuenta({
-      n_usuario: user,
-      fecha: req.body.fecha
+    connection.query(usuarios.modificarUsuario({
+      n_usuario: user
     }), function(err, rows, fields) {
       if (err){
         console.log(err)
         connection.rollback(function () {
-          res.status(500).send("No se ha podido insertar la tupla")
+          res.status(500).send("No se ha podido modificar la tupla")
         })
         return
       }
 
-      connection.commit(function (err) {
-        if (err) {
+      connection.query(usuarios.eliminarCuenta({
+        n_usuario: user,
+        fecha: req.body.fecha
+      }), function(err, rows, fields) {
+        if (err){
+          console.log(err)
           connection.rollback(function () {
-            res.status(500).send("No se ha podido completar la transacción")
+            res.status(500).send("No se ha podido insertar la tupla")
           })
           return
         }
-        return res.sendStatus(200)
+        
+        connection.query(usuarios.sesion({
+          n_usuario: req.body.user,
+          fecha_inicio: fecha_inicio,
+          fecha_fin: req.body.fecha,
+          hora_inicio: hora_inicio,
+          hora_fin: req.body.hora
+        }), function(err, rows, fields) {
+          if (err) {
+            console.log(err)
+            connection.rollback(function () {
+              res.status(500).send("No se ha podido insertar la tupla")
+            })
+            return
+          }
+          
+          connection.commit(function (err) {
+            if (err) {
+              connection.rollback(function () {
+                res.status(500).send("No se ha podido completar la transacción")
+              })
+              return
+            }
+            return res.sendStatus(200)
+          })
+        })
       })
     })
   })
