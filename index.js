@@ -233,7 +233,6 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
           return res.status(500).send("No son suficientes los puntos del usuario")
         }
         let puntos_user = rows[0].Puntos - puntos_compra 
-        console.log(puntos)
 
         connection.beginTransaction(function(err){
           if (err){
@@ -658,6 +657,8 @@ app.put('/api/biblioteca/lanzar/:n_juego', (req, res) => {
       return res.status(500).send("Error en la consulta")
     } else if (rows.length != 1){
       return res.status(500).send("El juego no pertenece al usuario")
+    } else if (rows[0].Estado != 'jugable'){
+      return res.status(500).send("El juego no está instalado")
     }
 
     connection.query(biblioteca.obtenerCompartidos({
