@@ -58,6 +58,11 @@ let dejarCompartirBiblioteca = function({n_usuario, n_amigo}){
   return `DELETE FROM Compartido WHERE nombreUsuario1='${n_usuario}' AND nombreUsuario2='${n_amigo}'`
 }
 
+let listar = function({consulta, n_usuario}){
+  console.log(consulta)
+  return `SELECT * FROM CopiaJuego WHERE nombreUsuario='${n_usuario}'`
+}
+
 let lanzarJuego = function({n_juego, n_usuario}){
   return `UPDATE CopiaJuego SET Estado='nojugable' WHERE nombreJuego='${n_juego}' AND nombreUsuario='${n_usuario}'`
 }
@@ -66,4 +71,4 @@ let finalizarJuego = function({n_juego, n_usuario}){
   return `UPDATE CopiaJuego SET Estado='jugable' WHERE nombreJuego='${n_juego}' AND nombreUsuario='${n_usuario}'`
 }
 
-module.exports = {comprarJuego, lastID, devolverJuego, comprobar, obtenerCompartidos, modificarCompartidos, quitarCopiasCompartidas, quitarCompartidos, comprobarEstado, actualizarJuego, instalarJuego, desinstalarJuego, comprobarCompartida, dejarCompartirBiblioteca, compartirBiblioteca, lanzarJuego, finalizarJuego}
+module.exports = {comprarJuego, lastID, devolverJuego, comprobar, obtenerCompartidos, modificarCompartidos, quitarCopiasCompartidas, quitarCompartidos, listar, comprobarEstado, actualizarJuego, instalarJuego, desinstalarJuego, comprobarCompartida, dejarCompartirBiblioteca, compartirBiblioteca, lanzarJuego, finalizarJuego}

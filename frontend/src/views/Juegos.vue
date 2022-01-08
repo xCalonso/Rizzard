@@ -65,7 +65,7 @@
             <td>{{value.Instalador}}</td>
             <td>{{value.nivelesRecompensa}}</td>
             <td>{{value.Licencia}}</td>
-            <td>{{value.Precio}}</td>
+            <td>{{value.Precio}}€</td>
             <td>{{value.Estado.data}}</td>
           </tr>
         </tbody>

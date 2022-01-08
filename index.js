@@ -31,6 +31,7 @@ app.use(bodyParser.urlencoded({
 
 
 const mysql = require('mysql');
+const { Console } = require('console')
 var connection
 function handleDisconnect() {
   connection = mysql.createConnection('mysql://b4cc23020ae5c0:62dacd4c@eu-cdbr-west-02.cleardb.net/heroku_512342ab1505158?reconnect=true');
@@ -636,6 +637,21 @@ app.put('/api/biblioteca/dejarcompartir/:n_amigo', (req, res) => {
   })
 })
 
+// Lista Juegos Comprados
+app.get('/api/biblioteca/comprados/:consulta', (req, res) => {
+  connection.query(biblioteca.listar({
+    consulta: req.params.consulta,
+    n_usuario: user
+  }), function (err, rows, fields) {
+    if (err){
+      console.log(err)
+      return res.status(404).send("Error en la consulta")
+    }
+    console.log(rows)
+    return res.send(rows)
+  });
+})
+
 // Lanzar Juego
 /*
   1. Comprobar que el juego pertenece al usuario.
@@ -662,14 +678,15 @@ app.put('/api/biblioteca/lanzar/:n_juego', (req, res) => {
     }
 
     connection.query(biblioteca.obtenerCompartidos({
-      n_amigo: user,
-      n_juego: req.params.n_juego
+      n_juego: req.params.n_juego,
+      n_usuario: user,
     }), function(err, rows, fields) {
       if (err){
         console.log(err)
         return res.status(500).send("Error en la consulta")
       }
       let fallo = false
+      console.log(user)
       connection.beginTransaction(function(err) {
         if (err){
           return res.status(500).send("No se ha podido iniciar la transacción")

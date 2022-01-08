@@ -1,7 +1,7 @@
 <template>
     <div id="biblioteca">
         <div class="display-1 font-weight-bold mt-6 mb-2"> Listar Juegos Disponibles</div>
-        <v-alert v-if="error.CJ" text type="error">Ha ocurrido un error. Comprueba que los campos anteriores son correctos.</v-alert>
+        <v-alert v-if="error.JC" text type="error">Ha ocurrido un error. Comprueba que los campos anteriores son correctos.</v-alert>
         <v-btn @click="JuegosComprar" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">LISTAR JUEGOS</v-btn>
 
         <v-simple-table v-if="lista">
@@ -26,7 +26,7 @@
               <td v-if="value.Estado.data == 1">{{value.nombreJuego}}</td> 
               <td v-if="value.Estado.data == 1">{{value.Categoria}}</td>
               <td v-if="value.Estado.data == 1">{{value.Pegi}}</td>
-              <td v-if="value.Estado.data == 1">{{value.Precio}}</td>
+              <td v-if="value.Estado.data == 1">{{value.Precio}}€</td>
             </tr>
           </tbody>
         </v-simple-table>
@@ -104,6 +104,38 @@
         <v-alert v-if="error.DCB_7" text type="error">Ha ocurrido un error. Comprueba que los campos anteriores son correctos.</v-alert>
         <v-btn @click="DejarCompartirBiblioteca" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">DEJAR DE COMPARTIR</v-btn>
         
+
+        <div class="display-1 font-weight-bold mt-6 mb-2"> Juegos Comprados</div>
+        <v-alert v-if="error.JC2" text type="error">Ha ocurrido un error. Comprueba que los campos anteriores son correctos.</v-alert>
+        <v-btn @click="JuegosComprados" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">LISTAR JUEGOS</v-btn>
+
+        <v-simple-table v-if="lista2">
+          <thead>
+            <tr>
+              <th class="text-left">
+                nombreJuego
+              </th>
+              <th class="text-left">
+                Version
+              </th>
+              <th class="text-left">
+                directorioInstalacion
+              </th>
+              <th class="text-left">
+                Estado
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="value in lista2" :key="value">
+              <td>{{value.nombreJuego}}</td> 
+              <td>{{value.Version}}</td>
+              <td>{{value.directorioInstalacion}}</td>
+              <td>{{value.Estado}}</td>
+            </tr>
+          </tbody>
+        </v-simple-table>
+
         
         <div class="display-1 font-weight-bold mt-6 mb-2"> Lanzar Juego (8)</div>
         <div style="max-width: 900px; margin: 0 auto">
@@ -134,6 +166,7 @@ const url = 'https://rizzard-x.herokuapp.com'
 export default {
   data: () => ({
     lista: null,
+    lista2: null,
     consulta: null,
 
     CJ_1: {
@@ -196,6 +229,7 @@ export default {
     
     error: {
       JC: false,
+      JC2: false,
       CJ_1: false,
       DJ_2: false,
       AJ_3: false,
@@ -222,6 +256,17 @@ export default {
         this.lista = (await axios.get(`${url}/api/biblioteca/${this.consulta}}`)).data
       } catch (err) {
         this.error.JC = true
+      }
+    },
+
+    async JuegosComprados(){
+      this.error.JC2 = false
+      this.consulta = 0
+      
+      try{
+        this.lista2 = (await axios.get(`${url}/api/biblioteca/comprados/${this.consulta}}`)).data
+      } catch (err) {
+        this.error.JC2 = true
       }
     },
 
