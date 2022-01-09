@@ -61,8 +61,8 @@ INSERT INTO Sesion (nombreUsuario, fechaInicio, fechaFin, horaInicio, horaFin) V
 
 INSERT INTO CopiaJuego (numCopia, nombreJuego, Version, directorioInstalacion, Estado, nombreUsuario, puntosGastados) VALUES
 	(1, 'GTA5', '3.2', 'C:/Usuarios/Pablo/Juegos/GTA5', 'actualizable', 'Pablo', 500),
-	(2, 'GTA5', '3.2', 'C:/Usuarios/Carlos/Juegos/GTA5', 'instalable', 'Carlos', 100),
-	(1, 'FIFA22', '1.3', 'C:/Usuarios/Bece/Juegos/FIFA22', 'instalable', 'Bece', 0),
+	(2, 'GTA5', '3.2', 'C:/Usuarios/Carlos/Juegos/GTA5', 'actualizable', 'Carlos', 100),
+	(1, 'FIFA22', '1.3', 'C:/Usuarios/Bece/Juegos/FIFA22', 'actualizable', 'Bece', 0),
 	(1, 'Battlefield 2042', '2.2', 'C:/Usuarios/Pablo/Juegos/Battlefield2042', 'jugable', 'Pablo', 200),
 	(1, 'Cyberpunk 2077', '1.0', 'C:/Usuarios/Javi/Juegos/Cyberpunk2077', 'jugable', 'Javi', 0),
 	(1, 'Far Cry 6', '1.1', 'C:/Usuarios/Carlos/Juegos/Farcry6', 'jugable', 'Javi', 1000),

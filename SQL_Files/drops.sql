@@ -1,13 +1,3 @@
-/*
-SET FOREIGN_KEY_CHECKS = 0
-
-SELECT concat('DROP TABLE IF EXISTS `', table_name, '`;')
-FROM information_schema.tables
-WHERE table_schema = 'heroku_512342ab1505158';
-
-SET FOREIGN_KEY_CHECKS = 1
-*/
-
 DROP TABLE IF EXISTS JuegoCompartido;
 DROP TABLE IF EXISTS CopiaJuego;
 DROP TABLE IF EXISTS Sesion;

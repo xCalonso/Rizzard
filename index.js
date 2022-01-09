@@ -57,7 +57,7 @@ handleDisconnect();
 
 //
 // ────────────────────────────────────────────────────────── I ──────
-// 			    B I B L I O T E C A
+// 			              B I B L I O T E C A
 // ────────────────────────────────────────────────────────────────────
 //
 
@@ -88,7 +88,8 @@ app.get('/api/biblioteca/:consulta', (req, res) => {
 */
 app.post('/api/biblioteca/comprar', (req, res) => {
   console.log(req.body)
-  
+
+  // 1.
   connection.query(juegos.comprobar({
     n_juego: req.body.n_juego
   }), function(err, rows, fields) {
@@ -99,6 +100,7 @@ app.post('/api/biblioteca/comprar', (req, res) => {
       return res.status(500).send("El juego no existe en la base de datos")
     }
     
+    // 2.
     connection.query(usuarios.comprobarPuntos({
       n_usuario: user
     }), function(err, rows, fields) {
@@ -110,6 +112,7 @@ app.post('/api/biblioteca/comprar', (req, res) => {
       }
       let puntos = rows[0].Puntos
 
+      // 3.
       connection.query(juegos.precio({
         n_juego: req.body.n_juego
       }), function(err, rows, fields) {
@@ -128,6 +131,7 @@ app.post('/api/biblioteca/comprar', (req, res) => {
           }
           console.log(puntos)
 
+          // 4.1.
           connection.query(usuarios.editarPuntos({
             puntos: puntos,
             n_usuario: user
@@ -140,6 +144,7 @@ app.post('/api/biblioteca/comprar', (req, res) => {
               return
             }
 
+            // 4.2.
             connection.query(biblioteca.lastID({
               n_juego: req.body.n_juego
             }), function(err, rows, fields) {
@@ -153,6 +158,7 @@ app.post('/api/biblioteca/comprar', (req, res) => {
               let id = rows[0].id+1
               let version = Math.floor(Math.random() * (10 - 1)) + 1;
 
+              // 4.3.
               connection.query(biblioteca.comprarJuego({
                 num_copia: id,
                 n_juego: req.body.n_juego,
@@ -194,12 +200,14 @@ app.post('/api/biblioteca/comprar', (req, res) => {
   4. Comenzar la transacción:
     4.1. Modificar los puntos del usuario con los calculados en el apartado 2.
     4.2. Eliminar todas las copias del juego que sean compartidas.
-    4.3. Eliminar la copia del juego del usuario comprador.
+    4.3. Eliminar las relaciones de las copias compartidas.
+    4.4. Eliminar la copia del juego del usuario comprador.
   5. COMMIT.
 */
 app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
   console.log(req.params.n_juego)
 
+  // 1.
   connection.query(juegos.comprobar({
     n_juego: req.params.n_juego
   }), function(err, rows, fields) {
@@ -211,6 +219,7 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
     }
     let precio = rows[0].Precio
 
+    // 2.
     connection.query(biblioteca.comprobar({
       n_juego: req.params.n_juego,
       n_usuario: user
@@ -224,6 +233,7 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
       let puntos_compra = (precio - rows[0].puntosGastados/100)*10
       console.log(puntos_compra)
 
+      // 3.
       connection.query(usuarios.comprobarPuntos({
         n_usuario: user
       }), function(err, rows, fields) {
@@ -240,6 +250,7 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
             return res.status(500).send("No se ha podido iniciar la transacción")
           }
 
+          // 4.1.
           connection.query(usuarios.editarPuntos({
             puntos: puntos_user,
             n_usuario: user,
@@ -265,6 +276,7 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
               } 
               let fallo = false
 
+              // 4.2.
               for (let i = 0; i < rows.length && !fallo; i++){
                 connection.query(biblioteca.quitarCopiasCompartidas({
                   n_juego: req.params.n_juego,
@@ -284,6 +296,7 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
                 return
               }
 
+              // 4.3.
               connection.query(biblioteca.quitarCompartidos({
                 n_juego: req.params.n_juego,
                 n_usuario: user
@@ -296,6 +309,7 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
                   return
                 }
 
+                // 4.4.
                 connection.query(biblioteca.devolverJuego({
                   n_juego: req.params.n_juego,
                   n_usuario: user
@@ -336,6 +350,7 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
   4. COMMIT.
 */
 app.post('/api/biblioteca/actualizar', (req, res) => {
+  // 1.
   connection.query(biblioteca.comprobar({
     n_juego: req.body.n_juego,
     n_usuario: user
@@ -347,6 +362,7 @@ app.post('/api/biblioteca/actualizar', (req, res) => {
       return res.status(500).send("El juego no pertenece al usuario")
     }
 
+    // 2.
     connection.query(biblioteca.comprobarEstado({
       n_juego: req.body.n_juego,
       n_usuario: user
@@ -364,6 +380,7 @@ app.post('/api/biblioteca/actualizar', (req, res) => {
         }
         let version = Math.floor(Math.random() * (10 - 1)) + 1;
 
+        // 3.1
         connection.query(biblioteca.actualizarJuego({
           n_juego: req.body.n_juego,
           n_usuario: user,
@@ -402,6 +419,7 @@ app.post('/api/biblioteca/actualizar', (req, res) => {
   4. COMMIT.
 */
 app.post('/api/biblioteca/instalar', (req, res) => {
+  // 1.
   connection.query(biblioteca.comprobar({
     n_juego: req.body.n_juego,
     n_usuario: user
@@ -413,6 +431,7 @@ app.post('/api/biblioteca/instalar', (req, res) => {
       return res.status(500).send("El juego no pertenece al usuario")
     }
 
+    // 2.
     connection.query(biblioteca.comprobarEstado({
       n_juego: req.body.n_juego,
       n_usuario: user
@@ -429,6 +448,7 @@ app.post('/api/biblioteca/instalar', (req, res) => {
           return res.status(500).send("No se ha podido iniciar la transacción")
         }
 
+        // 3.1.
         connection.query(biblioteca.instalarJuego({
           n_juego: req.body.n_juego,
           n_usuario: user,
@@ -466,6 +486,7 @@ app.post('/api/biblioteca/instalar', (req, res) => {
   4. COMMIT.
 */
 app.put('/api/biblioteca/desintalar/:n_juego', (req, res) => {
+  // 1.
   connection.query(biblioteca.comprobar({
     n_juego: req.params.n_juego,
     n_usuario: user
@@ -477,6 +498,7 @@ app.put('/api/biblioteca/desintalar/:n_juego', (req, res) => {
       return res.status(500).send("El juego no pertenece al usuario")
     }
 
+    // 2.
     connection.query(biblioteca.comprobarEstado({
       n_juego: req.params.n_juego,
       n_usuario: user
@@ -493,6 +515,7 @@ app.put('/api/biblioteca/desintalar/:n_juego', (req, res) => {
           return res.status(500).send("No se ha podido iniciar la transacción")
         }
 
+        // 3.1
         connection.query(biblioteca.desinstalarJuego({
           n_juego: req.params.n_juego,
           n_usuario: user,
@@ -522,7 +545,7 @@ app.put('/api/biblioteca/desintalar/:n_juego', (req, res) => {
 
 // Compartir Biblioteca
 /*
-  1. CompRobar que los usuarios son amigos.
+  1. Comprobar que los usuarios son amigos.
   2. Comprobar que las biblioteca no ha sido compartida con el amigo.
   3. Comenzar transacción:
     3.1. Añadir relación compartido entre los usuarios.
@@ -531,6 +554,7 @@ app.put('/api/biblioteca/desintalar/:n_juego', (req, res) => {
 app.put('/api/biblioteca/compartir/:n_amigo', (req, res) => {
   console.log(req.params.n_amigo)
 
+  // 1.
   connection.query(usuarios.sonAmigos({
     n_usuario: user,
     n_amigo: req.params.n_amigo
@@ -542,6 +566,7 @@ app.put('/api/biblioteca/compartir/:n_amigo', (req, res) => {
       return res.status(500).send("Los usuarios no son amigos")
     }
 
+    // 2.
     connection.query(biblioteca.comprobarCompartida({
       n_usuario: user,
       n_amigo: req.params.n_amigo
@@ -558,6 +583,7 @@ app.put('/api/biblioteca/compartir/:n_amigo', (req, res) => {
           return res.status(500).send("No se ha podido iniciar la transacción")
         }
 
+        // 3.1
         connection.query(biblioteca.compartirBiblioteca({
           n_usuario: user,
           n_amigo: req.params.n_amigo
@@ -595,6 +621,7 @@ app.put('/api/biblioteca/compartir/:n_amigo', (req, res) => {
 app.put('/api/biblioteca/dejarcompartir/:n_amigo', (req, res) => {
   console.log(req.params.n_amigo)
 
+  // 1.
   connection.query(biblioteca.comprobarCompartida({
     n_usuario: user,
     n_amigo: req.params.n_amigo
@@ -611,6 +638,7 @@ app.put('/api/biblioteca/dejarcompartir/:n_amigo', (req, res) => {
         return res.status(500).send("No se ha podido iniciar la transacción")
       }
 
+      // 2.1.
       connection.query(biblioteca.dejarCompartirBiblioteca({
         n_usuario: user,
         n_amigo: req.params.n_amigo
@@ -664,6 +692,7 @@ app.get('/api/biblioteca/comprados/:consulta', (req, res) => {
 app.put('/api/biblioteca/lanzar/:n_juego', (req, res) => {
   console.log(req.params.n_juego)
 
+  // 1.
   connection.query(biblioteca.comprobar({
     n_juego: req.params.n_juego,
     n_usuario: user
@@ -674,7 +703,7 @@ app.put('/api/biblioteca/lanzar/:n_juego', (req, res) => {
     } else if (rows.length != 1){
       return res.status(500).send("El juego no pertenece al usuario")
     } else if (rows[0].Estado != 'jugable'){
-      return res.status(500).send("El juego no está instalado")
+      return res.status(500).send("El juego no está instalado") // 2.
     }
 
     connection.query(biblioteca.obtenerCompartidos({
@@ -692,6 +721,7 @@ app.put('/api/biblioteca/lanzar/:n_juego', (req, res) => {
           return res.status(500).send("No se ha podido iniciar la transacción")
         }
 
+        // 3.1
         for(let i = 0; i < rows.length && !fallo; i++){
           connection.query(biblioteca.modificarCompartidos({
             estado: 'nojugable',
@@ -712,6 +742,7 @@ app.put('/api/biblioteca/lanzar/:n_juego', (req, res) => {
           return
         }
 
+        // 3.2
         connection.query(biblioteca.lanzarJuego({
           n_juego: req.params.n_juego,
           n_usuario: user
@@ -749,6 +780,7 @@ app.put('/api/biblioteca/lanzar/:n_juego', (req, res) => {
 app.put('/api/biblioteca/finalizar/:n_juego', (req, res) => {
   console.log(req.params.n_juego)
 
+  // 1.
   connection.query(biblioteca.comprobar({
     n_usuario: user,
     n_juego: req.params.n_juego
@@ -773,6 +805,7 @@ app.put('/api/biblioteca/finalizar/:n_juego', (req, res) => {
           return res.status(500).send("No se ha podido iniciar la transacción")
         }
 
+        // 2.1
         for(let i = 0; i < rows.length && !fallo; i++){
           connection.query(biblioteca.modificarCompartidos({
             estado: 'jugable',
@@ -793,6 +826,7 @@ app.put('/api/biblioteca/finalizar/:n_juego', (req, res) => {
           return
         }
 
+        // 2.2
         connection.query(biblioteca.finalizarJuego({
           n_juego: req.params.n_juego,
           n_usuario: user
@@ -823,15 +857,16 @@ app.put('/api/biblioteca/finalizar/:n_juego', (req, res) => {
 
 //
 // ────────────────────────────────────────────────────────── II ──────
-// 			          N U B E
+// 			                N U B E
 // ────────────────────────────────────────────────────────────────────
 //
 
 // Subir Partida
 /*
   1. Comenzar transacción:
-    1.1. Añadir partida del usuario a la nube
-    1.2. Añadir relacion tiene entre el usuario y la partida 
+    1.1. Añadir partida del usuario a la nube.
+    1.2. Añadir relacion tiene entre el usuario y la partida.
+    1.3. Comprueba el estado de la máquina para añadir los puntos de las recompensas.
   2. COMMIT
 */
 app.post('/api/nube/subir', (req, res) => {
@@ -841,6 +876,7 @@ app.post('/api/nube/subir', (req, res) => {
       return res.status(500).send("No se ha podido iniciar la transacción")
     }
     
+    // 1.1
     connection.query(nube.subirPartida({
       id_partida: req.body.id_partida, 
       fecha: req.body.fecha, 
@@ -858,6 +894,7 @@ app.post('/api/nube/subir', (req, res) => {
         return 
       }
       
+      // 1.2
       connection.query(nube.tienePartida({
         n_usuario: user,
         id_partida: req.body.id_partida
@@ -870,6 +907,7 @@ app.post('/api/nube/subir', (req, res) => {
           return 
         }
         
+        // 1.3
         if (req.body.estado == 'estado.dat'){
           connection.query(usuarios.comprobarPuntos({
             n_usuario: user
@@ -930,6 +968,7 @@ app.post('/api/nube/subir', (req, res) => {
 app.put('/api/nube/:id_partida', (req, res) => {
   console.log(req.params.id_partida)
   
+  // 1.
   connection.query(nube.comprobarPartida({
     n_usuario: user,
     id_partida: req.params.id_partida
@@ -947,15 +986,16 @@ app.put('/api/nube/:id_partida', (req, res) => {
 
 // Compartir Partida
 /*
-  1. Comprobar si el usuario ya tiene la partida indicada
-  2. Comprobar si los usuarios son amigos
+  1. Comprobar si el usuario ya tiene la partida indicada.
+  2. Comprobar si los usuarios son amigos.
   3. Comenzar transacción:
-    3.1. Añadir relacion entre el usuario amigo y la partida
+    3.1. Añadir relacion entre el usuario amigo y la partida.
   4. COMMIT
 */
 app.post('/api/nube/compartir', (req, res) => {
   console.log(req.body)
 
+  // 1.
   connection.query(nube.comprobarPartida({
     n_usuario: user,
     id_partida: req.body.id_partida
@@ -967,6 +1007,7 @@ app.post('/api/nube/compartir', (req, res) => {
       return res.status(500).send("Usuario no tiene partida")
     }
     console.log("Usuario tiene partida")
+    // 2.
     connection.query(usuarios.sonAmigos({
       n_usuario: user,
       n_amigo: req.body.n_amigo
@@ -982,6 +1023,7 @@ app.post('/api/nube/compartir', (req, res) => {
         if (err){
           return res.status(500).send("No se ha podido iniciar la transacción")
         }    
+        // 3.1
         connection.query(nube.tienePartida({
           n_usuario: req.body.n_amigo,
           id_partida: req.body.id_partida
@@ -1022,11 +1064,14 @@ let hora_inicio = ""
 
 // Inicio de Sesion
 /*
-
+  1. Comprobar que el usuario no está eliminado.
+  2. Comprobar que el usuario y la contraseña son correctas.
+  3. Almacenar en variables la fecha y hora de inicio de sesión
 */
 app.post('/api/login', (req, res) => {
   //console.log(req.body)
   
+  // 1.
   connection.query(usuarios.eliminado({
     n_usuario: req.body.user,
   }), function(err, rows, fields){
@@ -1036,6 +1081,7 @@ app.post('/api/login', (req, res) => {
     } else if (rows.length == 1){
       return res.status(500).send("El usuario está eliminado");
     }
+    // 2.
     connection.query(login.iniciar({
       user: req.body.user,
       password: req.body.password
@@ -1045,6 +1091,7 @@ app.post('/api/login', (req, res) => {
         return res.status(500).send("No coinciden las credenciales");
       }
       console.log(rows.length)
+      // 3.
       if (rows.length == 1){
         user = req.body.user
         fecha_inicio = req.body.fecha
@@ -1078,7 +1125,9 @@ app.get('/api/login/:user', (req, res) => {
 
 // Cerrar Sesión
 /*
-
+  1. Comenzar transacción:
+    1.1. Añadir sesión con las fechas y horas.
+  2. COMMIT
 */
 app.post('/api/login/logout', (req, res) => {
   console.log(req.body)
@@ -1088,6 +1137,7 @@ app.post('/api/login/logout', (req, res) => {
       return res.status(500).send("No se ha podido iniciar la transacción")
     }
 
+    // 1.1
     connection.query(usuarios.sesion({
       n_usuario: user,
       fecha_inicio: fecha_inicio,
@@ -1128,7 +1178,10 @@ app.get('/api/login/comprobar/:user', (req, res) => {
 
 // Registrar un Usuario
 /*
-
+  1. Comenzar transacción:
+    1.1. Añadir un usuario.
+    1.2. Establecer administrador si se ha marcado la casilla.
+  2. COMMIT
 */
 app.post('/api/register', (req, res) =>{
   console.log(req.body)
@@ -1137,6 +1190,7 @@ app.post('/api/register', (req, res) =>{
   if (err){
     return res.status(500).send("No se ha podido iniciar la transacción")
   }
+  // 1.1
   connection.query(login.registrar({
     n_usuario: req.body.user,
     correo: req.body.correo,
@@ -1150,6 +1204,7 @@ app.post('/api/register', (req, res) =>{
       return
     }
 
+    // 1.2
     if (req.body.admin){
       connection.query(usuarios.setAdministrador({
         n_usuario: req.body.user
@@ -1189,7 +1244,11 @@ app.post('/api/register', (req, res) =>{
 
 // Eliminar Cuenta
 /*
-
+  1. Comenzar transacción:
+    1.1. Modificar el nombre de usuario de 'cuenta_eliminada_{nombreUsuario}'
+    1.2. Añadir la usuario a usuarios eliminados.
+    1.3. Añadir sesión con las fechas y horas.
+  2. COMMIT
 */
 app.post('/usuarios/eliminar', (req, res) => {
   console.log(req.body)
@@ -1199,6 +1258,7 @@ app.post('/usuarios/eliminar', (req, res) => {
       return res.status(500).send("No se ha podido iniciar la transacción")
     }
 
+    // 1.1
     connection.query(usuarios.modificarUsuario({
       n_usuario: user
     }), function(err, rows, fields) {
@@ -1210,6 +1270,7 @@ app.post('/usuarios/eliminar', (req, res) => {
         return
       }
 
+      // 1.2
       connection.query(usuarios.eliminarCuenta({
         n_usuario: user,
         fecha: req.body.fecha
@@ -1222,6 +1283,7 @@ app.post('/usuarios/eliminar', (req, res) => {
           return
         }
         
+        // 1.3
         connection.query(usuarios.sesion({
           n_usuario: req.body.user,
           fecha_inicio: fecha_inicio,
@@ -1262,6 +1324,7 @@ app.post('/usuarios/eliminar', (req, res) => {
 app.put('/api/usuarios/agregar/:n_amigo', (req, res) => {
   console.log(req.params.n_amigo)
   
+  // 1.
   connection.query(usuarios.sonAmigos({
     n_usuario: user,
     n_amigo: req.params.n_amigo
@@ -1278,6 +1341,7 @@ app.put('/api/usuarios/agregar/:n_amigo', (req, res) => {
         return res.status(500).send("No se ha podido iniciar la transacción")
       }
   
+      // 2.1
       connection.query(usuarios.añadirAmigo({
         n_usuario: user,
         n_amigo: req.params.n_amigo
@@ -1312,6 +1376,7 @@ app.put('/api/usuarios/agregar/:n_amigo', (req, res) => {
 */
 app.put('/api/usuarios/borrar/:n_amigo', (req, res) => {
   console.log(req.params.n_amigo)
+  // 1.
   connection.query(usuarios.sonAmigos({
     n_usuario: user,
     n_amigo: req.params.n_amigo
@@ -1326,6 +1391,7 @@ app.put('/api/usuarios/borrar/:n_amigo', (req, res) => {
       if (err) {
         return res.status(500).send("No se ha podido iniciar la transacción")
       }
+      // 2.1
       connection.query(usuarios.eliminarAmigo({
         n_usuario: user,
         n_amigo: req.params.n_amigo
@@ -1367,6 +1433,7 @@ app.put('/api/usuarios/borrar/:n_amigo', (req, res) => {
 app.post('/api/juegos/alta', (req, res) => {
   console.log(req.body)
 
+  // 1.
   connection.query(juegos.comprobar({
     n_juego: req.body.n_juego
   }), function(err, rows, fields) {
@@ -1383,6 +1450,7 @@ app.post('/api/juegos/alta', (req, res) => {
         console.log(err)
         return res.status(500).send("No se ha podido iniciar la transacción")
       }
+      // 2.1
       connection.query(juegos.darAlta(req.body), function(err, rows, fields) {
         if (err) {
           console.log(err)
@@ -1414,6 +1482,7 @@ app.post('/api/juegos/alta', (req, res) => {
   3. COMMIT
 */
 app.put('/api/juegos/:n_juego', (req, res) => {
+  // 1.
   connection.query(juegos.comprobar({
     n_juego: req.params.n_juego
   }), function(err, rows, fields) {
@@ -1425,6 +1494,7 @@ app.put('/api/juegos/:n_juego', (req, res) => {
       return res.status(500).send("No existe este juego")
     }
     
+    // 2.1
     connection.beginTransaction(function(err) {
       if (err){
         console.log(err)
