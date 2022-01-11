@@ -1,3 +1,7 @@
+let comprobar = function({n_usuario}){
+  return `SELECT * FROM Usuario WHERE nombreUsuario='${n_usuario}'`
+}
+
 let sonAmigos = function({n_usuario, n_amigo}){
   return `SELECT * FROM Amigos WHERE (nombreUsuario1 = '${n_usuario}' AND nombreUsuario2 = '${n_amigo}') OR (nombreUsuario1 = '${n_amigo}' AND nombreUsuario2 = '${n_usuario}')`
 }
@@ -8,6 +12,10 @@ let añadirAmigo = function({n_usuario, n_amigo}){
 
 let eliminarAmigo = function({n_usuario, n_amigo}){
   return `DELETE FROM Amigos WHERE (nombreUsuario1='${n_usuario}' AND nombreUsuario2='${n_amigo}') OR (nombreUsuario1='${n_amigo}' AND nombreUsuario2='${n_usuario}')`
+}
+
+let listarAmigos = function({n_usuario}){
+  return `SELECT * FROM Amigos WHERE nombreUsuario1='${n_usuario}' OR nombreUsuario2='${n_usuario}'`
 }
 
 let comprobarPuntos = function({n_usuario}){
@@ -42,4 +50,4 @@ let eliminarCuenta = function({n_usuario, fecha}){
   return `INSERT INTO UsuarioEliminado (nombreUsuario, Fecha) VALUES ('${n_usuario}', '${fecha}')`
 }
 
-module.exports = {sonAmigos, añadirAmigo, eliminarAmigo, comprobarPuntos, editarPuntos, sesion, eliminado, habilitar, setAdministrador, modificarUsuario, eliminarCuenta}
+module.exports = {comprobar, sonAmigos, añadirAmigo, eliminarAmigo, listarAmigos, comprobarPuntos, editarPuntos, sesion, eliminado, habilitar, setAdministrador, modificarUsuario, eliminarCuenta}

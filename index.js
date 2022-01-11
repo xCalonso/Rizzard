@@ -4,7 +4,6 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const path = require('path')
 const port = process.env.PORT || 8080
-const history = require('connect-history-api-fallback')
 
 const biblioteca = require('./backend/sql/biblioteca')
 const nube = require('./backend/sql/nube')
@@ -14,13 +13,6 @@ const login = require('./backend/sql/login')
 
 
 const app = express()
-
-app.use(bodyParser.urlencoded({
-  extended: false
-}))
-app.use(bodyParser.json())
-
-
 var cors = require('cors');
 
 app.use(cors());
@@ -31,7 +23,6 @@ app.use(bodyParser.urlencoded({
 
 
 const mysql = require('mysql');
-const { Console } = require('console')
 var connection
 function handleDisconnect() {
   connection = mysql.createConnection('mysql://b4cc23020ae5c0:62dacd4c@eu-cdbr-west-02.cleardb.net/heroku_512342ab1505158?reconnect=true');
@@ -77,76 +68,77 @@ app.get('/api/biblioteca/:consulta', (req, res) => {
 
 // Comprar Juego
 /*
-  1. Comprobar que el juego está en la base de datos.
-  2. Comprobar que el usuario tiene suficientes puntos.
-  3. Calcular los puntos conseguidos a partir del precio con el descuento.
-  4. Comenzar transacción:
-    4.1. Modificar los puntos del usuario con los calculado en el apartado 3.
-    4.2. Calcular el numero de copia del juego comprado
-    4.3. Añadir la copia del juego al usuario comprador
-  5. COMMIT
+  1. Comprobar que el juego no ha sido comprado por el usuario
+  2. Comprobar que el juego está en la base de datos.
+  3. Comprobar que el usuario tiene suficientes puntos.
+  4. Calcular los puntos conseguidos a partir del precio con el descuento.
+  5. Comenzar transacción:
+    5.1. Modificar los puntos del usuario con los calculado en el apartado 3.
+    5.2. Calcular el numero de copia del juego comprado
+    5.3. Añadir la copia del juego al usuario comprador
+  6. COMMIT
 */
 app.post('/api/biblioteca/comprar', (req, res) => {
   console.log(req.body)
 
   // 1.
-  connection.query(juegos.comprobar({
-    n_juego: req.body.n_juego
+  connection.query(biblioteca.comprobar({
+    n_juego: req.body.n_juego,
+    n_usuario: user 
   }), function(err, rows, fields) {
     if (err){
       console.log(err)
       return res.status(500).send("Error en la consulta")
-    } else if (rows.length != 1){
-      return res.status(500).send("El juego no existe en la base de datos")
+    } else if (rows.length == 1){
+      return res.status(500).send("El juego ya ha sido comprado")
     }
-    
+
     // 2.
-    connection.query(usuarios.comprobarPuntos({
-      n_usuario: user
+    connection.query(juegos.comprobar({
+      n_juego: req.body.n_juego
     }), function(err, rows, fields) {
       if (err){
         console.log(err)
         return res.status(500).send("Error en la consulta")
-      } else if (rows[0].Puntos < req.body.puntos){
-        return res.status(500).send("Cantidad de puntos excedida")
+      } else if (rows.length != 1){
+        return res.status(500).send("El juego no existe en la base de datos")
       }
-      let puntos = rows[0].Puntos
-
+      
       // 3.
-      connection.query(juegos.precio({
-        n_juego: req.body.n_juego
+      connection.query(usuarios.comprobarPuntos({
+        n_usuario: user
       }), function(err, rows, fields) {
         if (err){
           console.log(err)
           return res.status(500).send("Error en la consulta")
+        } else if (rows[0].Puntos < req.body.puntos){
+          return res.status(500).send("Cantidad de puntos excedida")
         }
-        console.log(rows)
-        let puntos_compra = (rows[0].Precio - req.body.puntos/100)*10
-        console.log(puntos_compra)
-        puntos += puntos_compra
+        let puntos = rows[0].Puntos
 
-        connection.beginTransaction(function(err) {
+        // 4.
+        connection.query(juegos.precio({
+          n_juego: req.body.n_juego
+        }), function(err, rows, fields) {
           if (err){
-            return res.status(500).send("No se ha podido iniciar la transacción")
+            console.log(err)
+            return res.status(500).send("Error en la consulta")
           }
-          console.log(puntos)
+          console.log(rows)
+          let puntos_compra = (rows[0].Precio - req.body.puntos/100)*10
+          console.log(puntos_compra)
+          puntos += puntos_compra
 
-          // 4.1.
-          connection.query(usuarios.editarPuntos({
-            puntos: puntos,
-            n_usuario: user
-          }), function(err, rows, fields) {
-            if (err) {
-              console.log(err)
-              connection.rollback(function () {
-                res.status(500).send("No se ha podido insertar la tupla")
-              })
-              return
+          connection.beginTransaction(function(err) {
+            if (err){
+              return res.status(500).send("No se ha podido iniciar la transacción")
             }
+            console.log(puntos)
 
-            // 4.2.
-            connection.query(biblioteca.lastID({
-              n_juego: req.body.n_juego
+            // 5.1.
+            connection.query(usuarios.editarPuntos({
+              puntos: puntos,
+              n_usuario: user
             }), function(err, rows, fields) {
               if (err) {
                 console.log(err)
@@ -155,16 +147,10 @@ app.post('/api/biblioteca/comprar', (req, res) => {
                 })
                 return
               }
-              let id = rows[0].id+1
-              let version = Math.floor(Math.random() * (10 - 1)) + 1;
 
-              // 4.3.
-              connection.query(biblioteca.comprarJuego({
-                num_copia: id,
-                n_juego: req.body.n_juego,
-                version: version,
-                n_usuario: user,
-                puntos_compra: req.body.puntos
+              // 5.2.
+              connection.query(biblioteca.lastID({
+                n_juego: req.body.n_juego
               }), function(err, rows, fields) {
                 if (err) {
                   console.log(err)
@@ -173,15 +159,34 @@ app.post('/api/biblioteca/comprar', (req, res) => {
                   })
                   return
                 }
+                let id = rows[0].id+1
+                let version = Math.floor(Math.random() * (10 - 1)) + 1;
 
-                connection.commit(function (err) {
+                // 5.3.
+                connection.query(biblioteca.comprarJuego({
+                  num_copia: id,
+                  n_juego: req.body.n_juego,
+                  version: version,
+                  n_usuario: user,
+                  puntos_compra: req.body.puntos
+                }), function(err, rows, fields) {
                   if (err) {
+                    console.log(err)
                     connection.rollback(function () {
-                      res.status(500).send("No se ha podido completar la transacción")
+                      res.status(500).send("No se ha podido insertar la tupla")
                     })
                     return
                   }
-                  return res.sendStatus(200)
+
+                  connection.commit(function (err) {
+                    if (err) {
+                      connection.rollback(function () {
+                        res.status(500).send("No se ha podido completar la transacción")
+                      })
+                      return
+                    }
+                    return res.sendStatus(200)
+                  })
                 })
               })
             })
@@ -1316,51 +1321,64 @@ app.post('/usuarios/eliminar', (req, res) => {
 
 // Agregar un Amigo
 /*
-  1. Comprobar que los usuarios son amigos
-  2. Comenzar transacción:
-    2.1. Añadir relacion entre los usuarios
-  3. COMMIT
+  1. Comprobar si el usuario existe.
+  2. Comprobar que los usuarios son amigos.
+  3. Comenzar transacción:
+    3.1. Añadir relacion entre los usuarios.
+  4. COMMIT
 */
 app.put('/api/usuarios/agregar/:n_amigo', (req, res) => {
   console.log(req.params.n_amigo)
   
   // 1.
-  connection.query(usuarios.sonAmigos({
-    n_usuario: user,
-    n_amigo: req.params.n_amigo
+  connection.query(usuarios.comprobar({
+    n_usuario: req.params.n_amigo
   }), function(err, rows, fields) {
     if (err){
       console.log(err)
       return res.status(500).send("Error en la consulta")
-    } else if (rows.length == 1) {
-      console.log("Ya son amigos")
-      return res.sendstatus(500).send("Ya son amigos")
+    } else if (rows.length != 1){
+      return res.status(500).send("No existe ese usuario")
     }
-    connection.beginTransaction(function (err) {
-      if (err) {
-        return res.status(500).send("No se ha podido iniciar la transacción")
+
+    // 2.
+    connection.query(usuarios.sonAmigos({
+      n_usuario: user,
+      n_amigo: req.params.n_amigo
+    }), function(err, rows, fields) {
+      if (err){
+        console.log(err)
+        return res.status(500).send("Error en la consulta")
+      } else if (rows.length == 1) {
+        console.log("Ya son amigos")
+        return res.status(500).send("Ya son amigos")
       }
-  
-      // 2.1
-      connection.query(usuarios.añadirAmigo({
-        n_usuario: user,
-        n_amigo: req.params.n_amigo
-      }), function (err, rows, fields) {
-        if (err){
-          console.log(err)
-          connection.rollback(function () {
-            res.status(500).send("No se ha podido insertar la tupla")
-          })
-          return
+      connection.beginTransaction(function (err) {
+        if (err) {
+          return res.status(500).send("No se ha podido iniciar la transacción")
         }
-        connection.commit(function (err) {
-          if (err) {
+    
+        // 3.1
+        connection.query(usuarios.añadirAmigo({
+          n_usuario: user,
+          n_amigo: req.params.n_amigo
+        }), function (err, rows, fields) {
+          if (err){
+            console.log(err)
             connection.rollback(function () {
-              res.status(500).send("No se ha podido completar la transacción")
+              res.status(500).send("No se ha podido insertar la tupla")
             })
             return
           }
-          return res.sendStatus(200)
+          connection.commit(function (err) {
+            if (err) {
+              connection.rollback(function () {
+                res.status(500).send("No se ha podido completar la transacción")
+              })
+              return
+            }
+            return res.sendStatus(200)
+          })
         })
       })
     })
@@ -1414,6 +1432,38 @@ app.put('/api/usuarios/borrar/:n_amigo', (req, res) => {
         })
       })
     })
+  })
+})
+
+// Ver Puntos
+app.get('/api/usuarios/puntos/:consulta', (req, res) => {
+  console.log(req.params.consulta)
+
+  connection.query(usuarios.comprobarPuntos({
+    n_usuario: user
+  }), function(err, rows, fields) {
+    if (err){
+      console.log(err)
+      return res.status(404).send("Error en la consulta")
+    }
+    console.log(rows)
+    return res.send(rows)
+  })
+})
+
+// Listar Amigos
+app.get('/api/usuarios/amigos/:consulta', (req, res) => {
+  console.log(req.params.consulta)
+
+  connection.query(usuarios.listarAmigos({
+    n_usuario: user
+  }), function(err, rows, fields) {
+    if (err){
+      console.log(err)
+      return res.status(404).send("Error en la consulta")
+    }
+    console.log(rows)
+    return res.send(rows)
   })
 })
 
@@ -1530,7 +1580,7 @@ app.put('/api/juegos/:n_juego', (req, res) => {
   1. Obtener todos los juegos que se han dado de alta en la base de datos
 */
 app.get('/api/juegos/:consulta', (req, res) => {
-  console.log(req.body)
+  console.log(req.params.consulta)
   connection.query(juegos.listar({
     consulta: req.params.consulta
   }), function (err, rows, fields) {

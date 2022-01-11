@@ -1,5 +1,25 @@
 <template>
     <div id="usuarios">
+      <div class="display-1 font-weight-bold mt-6 mb-2">Puntos del Usuario</div>
+      <v-alert v-if="error.P" text type="error">Ha ocurrido un error.</v-alert>
+      <v-btn @click="Puntos" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">PUNTOS</v-btn>
+
+      <v-simple-table v-if="lista">
+        <thead>
+          <tr>
+            <th class="text-left">
+              Puntos
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="value in lista" :key="value">
+            <td>{{value.Puntos}}</td> 
+          </tr>
+        </tbody>
+    </v-simple-table>
+
+
       <div class="display-1 font-weight-bold mt-6 mb-2">Agregar Amigo (17)</div>
       <div style="max-width: 900px; margin: 0 auto">
           <v-text-field :rules="[field_not_empty]" v-model="AA_17.n_amigo" placeholder="Nombre de Usuario" outlined></v-text-field>
@@ -18,6 +38,30 @@
       <v-btn @click="EliminarAmigo" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">Borrar</v-btn>
 
 
+      <div class="display-1 font-weight-bold mt-6 mb-2">Lista de Amigos</div>
+      <v-alert v-if="error.P" text type="error">Ha ocurrido un error.</v-alert>
+      <v-btn @click="Amigos" color="secondary" dark x-large outlined :style="{left: '50%', transform:'translateX(-50%)'}">LISTAR</v-btn>
+
+      <v-simple-table v-if="lista2">
+        <thead>
+          <tr>
+            <th class="text-left">
+              nombreUsuario1
+            </th>
+            <th class="text-left">
+              nombreUsuario2
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="value in lista2" :key="value">
+            <td>{{value.nombreUsuario1}}</td> 
+            <td>{{value.nombreUsuario2}}</td>
+          </tr>
+        </tbody>
+    </v-simple-table>
+
+
       <div class="display-1 font-weight-bold mt-6 mb-2">Eliminar Cuenta (14)</div>
       <div style="max-width: 900px; margin: 0 auto">
             <v-text-field :rules="[field_not_empty]" type="password" v-model="EC_14.pass" placeholder="Contraseña" outlined></v-text-field>
@@ -31,11 +75,15 @@
 
 <script>
 import axios from 'axios'
-const url = 'http://localhost:8080'
-//const url = 'https://rizzard-x.herokuapp.com'
+//const url = 'http://localhost:8080'
+const url = 'https://rizzard-x.herokuapp.com'
 
 export default {
-  data: () => ({    
+  data: () => ({ 
+    lista: null,
+    lista2: null,
+    consulta: null,
+
     EC_14: {
       pass: "",
       fecha: "",
@@ -55,6 +103,8 @@ export default {
     },
     
     error: {
+      P: false,
+      A: false,
       EC_14: false,
       AA_17: false,
       EA_18: false,
@@ -66,6 +116,26 @@ export default {
   }),
   
   methods: {
+    async Puntos(){
+      this.error.P = false
+
+      try {
+        this.lista = (await axios.get(`${url}/api/usuarios/puntos/${this.consulta}}`)).data
+      } catch (err) {
+        this.error.P = true
+      }
+    },
+
+    async Amigos(){
+      this.error.A = false
+
+      try{
+        this.lista2 = (await axios.get(`${url}/api/usuarios/amigos/${this.consulta}}`)).data
+      } catch (err) {
+        this.error.A = true
+      }
+    },
+
     async AgregarAmigo(){
       this.success.AA_17 = false
       this.error.AA_17 = false
