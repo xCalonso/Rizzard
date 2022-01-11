@@ -38,7 +38,7 @@
 
 import axios from 'axios'
 //const url = 'http://localhost:8080'
-const url = 'https://rizzard-x.herokuapp.com/'
+const url = 'https://rizzard-x.herokuapp.com'
 
 export default {
   data: () => ({
