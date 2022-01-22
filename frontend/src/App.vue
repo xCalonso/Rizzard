@@ -3,8 +3,9 @@
     <div v-if="!!user">
     <v-navigation-drawer app color="primary" dark>
       <v-layout class="my-6 mx-4" style="cursor: pointer;" align-center @click="$router.push({path: '/'})">
-        <img src="./assets/rizzardx.png" alt="Rizzard" style="width: 40px; height: 40px; margin-right: 8px">
-        <h1 style="font-weight: 800; color:white">RIZZARD X</h1>
+        <img src="./assets/rizzardx.png" alt="Rizzard" style="width: 50px; height: 50px; margin-right: 5px">
+        <h1 style="font-weight: 800; font-size: 1.4em; color:white">RIZZARD X</h1>
+        <img src="./assets/rizzardx1.png" alt="Rizzard" style="width: 50px; height: 50px; margin-left: 5px">
       </v-layout>
       <v-list-item @click="$router.push({ path: '/biblioteca' })">
         <v-list-item-avatar>
