@@ -18,8 +18,24 @@ let obtenerCompartidos = function({n_juego, n_usuario}){
   return `SELECT * FROM JuegoCompartido WHERE nombreJuego='${n_juego}' AND nombreAmigo='${n_usuario}'`
 }
 
+let obtenerTodosCompartidos = function({n_usuario}){
+  return `SELECT * FROM JuegoCompartido WHERE nombreAmigo='${n_usuario}'`
+}
+
+let buscarCopiasCompartidasUsuario = function({n_juego, num_copia, n_usuario}){
+  return `SELECT * FROM CopiaJuego WHERE nombreJuego='${n_juego}' AND numCopia='${num_copia}' AND nombreUsuario='${n_usuario}'`
+}
+
+let quitarCopiasCompartidasUsuario = function({n_juego, num_copia, n_usuario}){
+  return `DELETE FROM CopiaJuego WHERE nombreJuego='${n_juego}' AND numCopia='${num_copia}' AND nombreUsuario='${n_usuario}'`
+}
+
 let quitarCompartidos = function({n_juego, n_usuario}){
   return `DELETE FROM JuegoCompartido WHERE nombreJuego='${n_juego}' AND nombreAmigo='${n_usuario}'`
+}
+
+let quitarCompartidosCopia = function({n_juego, num_copia, n_usuario}){
+  return `DELETE FROM JuegoCompartido WHERE nombreJuego='${n_juego}' AND numCopia='${num_copia}' AND nombreAmigo='${n_usuario}'`
 }
 
 let quitarCopiasCompartidas = function({n_juego, num_copia}){
@@ -71,4 +87,4 @@ let finalizarJuego = function({n_juego, n_usuario}){
   return `UPDATE CopiaJuego SET Estado='jugable' WHERE nombreJuego='${n_juego}' AND nombreUsuario='${n_usuario}'`
 }
 
-module.exports = {comprarJuego, lastID, devolverJuego, comprobar, obtenerCompartidos, modificarCompartidos, quitarCopiasCompartidas, quitarCompartidos, listar, comprobarEstado, actualizarJuego, instalarJuego, desinstalarJuego, comprobarCompartida, dejarCompartirBiblioteca, compartirBiblioteca, lanzarJuego, finalizarJuego}
+module.exports = {comprarJuego, lastID, devolverJuego, comprobar, obtenerCompartidos, obtenerTodosCompartidos, quitarCompartidosCopia, quitarCopiasCompartidasUsuario, buscarCopiasCompartidasUsuario, modificarCompartidos, quitarCopiasCompartidas, quitarCompartidos, listar, comprobarEstado, actualizarJuego, instalarJuego, desinstalarJuego, comprobarCompartida, dejarCompartirBiblioteca, compartirBiblioteca, lanzarJuego, finalizarJuego}

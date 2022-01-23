@@ -204,8 +204,8 @@ app.post('/api/biblioteca/comprar', (req, res) => {
   3. Comprobar si el usuario tiene suficientes puntos.
   4. Comenzar la transacción:
     4.1. Modificar los puntos del usuario con los calculados en el apartado 2.
-    4.2. Eliminar todas las copias del juego que sean compartidas.
-    4.3. Eliminar las relaciones de las copias compartidas.
+    4.2. Eliminar las relaciones de las copias compartidas.
+    4.3. Eliminar todas las copias del juego que sean compartidas.
     4.4. Eliminar la copia del juego del usuario comprador.
   5. COMMIT.
 */
@@ -280,28 +280,9 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
                 return
               } 
               let fallo = false
+              let aux = rows
 
               // 4.2.
-              for (let i = 0; i < rows.length && !fallo; i++){
-                connection.query(biblioteca.quitarCopiasCompartidas({
-                  n_juego: req.params.n_juego,
-                  num_copia: rows[i].num_copia
-                }), function(err, rows, fields) {
-                  if (err){
-                    fallo = true
-                    console.log(err)
-                    connection.rollback(function () {
-                      res.status(500).send("No se ha podido borrar la tupla")
-                    })
-                    return
-                  }
-                })
-              }
-              if (fallo){
-                return
-              }
-
-              // 4.3.
               connection.query(biblioteca.quitarCompartidos({
                 n_juego: req.params.n_juego,
                 n_usuario: user
@@ -311,6 +292,26 @@ app.put('/api/biblioteca/devolver/:n_juego', (req, res) => {
                   connection.rollback(function () {
                     res.status(500).send("Error en la consulta")
                   })
+                  return
+                }
+
+                // 4.3.
+                for (let i = 0; i < aux.length && !fallo; i++){
+                  connection.query(biblioteca.quitarCopiasCompartidas({
+                    n_juego: req.params.n_juego,
+                    num_copia: aux[i].numCopia
+                  }), function(err, rows, fields) {
+                    if (err){
+                      fallo = true
+                      console.log(err)
+                      connection.rollback(function () {
+                        res.status(500).send("No se ha podido borrar la tupla")
+                      })
+                      return
+                    }
+                  })
+                }
+                if (fallo){
                   return
                 }
 
@@ -620,7 +621,9 @@ app.put('/api/biblioteca/compartir/:n_amigo', (req, res) => {
 /*
   1. Comprobar que la biblioteca ha sido compartida con el amigo.
   2. Comenzar transacción:
-    2.1. Borrar relación compartido entre los usuarios.
+    2.1. Eliminar las relaciones de las copias compartidas.
+    2.2. Eliminar todas las copias del juego que sean compartidas.
+    2.3. Borrar relación compartido entre los usuarios.
   3. COMMIT.
 */
 app.put('/api/biblioteca/dejarcompartir/:n_amigo', (req, res) => {
@@ -643,27 +646,94 @@ app.put('/api/biblioteca/dejarcompartir/:n_amigo', (req, res) => {
         return res.status(500).send("No se ha podido iniciar la transacción")
       }
 
-      // 2.1.
-      connection.query(biblioteca.dejarCompartirBiblioteca({
-        n_usuario: user,
-        n_amigo: req.params.n_amigo
+      connection.query(biblioteca.obtenerTodosCompartidos({
+        n_usuario: user
       }), function(err, rows, fields) {
         if (err){
           console.log(err)
           connection.rollback(function () {
-            res.status(500).send("No se ha podido borrar la tupla")
+            res.status(500).send("Error en la consulta")
           })
           return
-        }
+        } 
+        let fallo = false
+        let aux = rows
 
-        connection.commit(function (err) {
-          if (err) {
+        
+        for (let i = 0; i < aux.length && !fallo; i++){
+          connection.query(biblioteca.buscarCopiasCompartidasUsuario({
+            n_juego: aux[i].nombreJuego,
+            num_copia: aux[i].numCopia,
+            n_usuario: req.params.n_amigo
+          }), function(err, rows, fields) {
+            if (err){
+              fallo = true
+              console.log(err)
+              connection.rollback(function () {
+                res.status(500).send("Error en la consulta")
+              })
+              return
+            } else if (rows.length != 1){
+              return
+            }
+            // 2.1
+            connection.query(biblioteca.quitarCompartidosCopia({
+              n_juego: aux[i].nombreJuego,
+              num_copia: aux[i].numCopia,
+              n_usuario: user
+            }), function(err, rows, fields) {
+              if (err){
+                fallo = true
+                console.log(err)
+                connection.rollback(function () {
+                  res.status(500).send("No se ha podido borrar la tupla")
+                })
+                return
+              }
+              // 2.2
+              connection.query(biblioteca.quitarCopiasCompartidasUsuario({
+                n_juego: aux[i].nombreJuego,
+                num_copia: aux[i].numCopia,
+                n_usuario: req.params.n_amigo
+              }), function(err, rows, fields) {
+                if (err){
+                  fallo = true
+                  console.log(err)
+                  connection.rollback(function () {
+                    res.status(500).send("No se ha podido borrar la tupla")
+                  })
+                  return
+                }
+              })
+            })
+
+          })
+        }
+        if (fallo){
+          return
+        }
+        // 2.3.
+        connection.query(biblioteca.dejarCompartirBiblioteca({
+          n_usuario: user,
+          n_amigo: req.params.n_amigo
+        }), function(err, rows, fields) {
+          if (err){
+            console.log(err)
             connection.rollback(function () {
-              res.status(500).send("No se ha podido completar la transacción")
+              res.status(500).send("No se ha podido borrar la tupla")
             })
             return
           }
-          return res.sendStatus(200)
+
+          connection.commit(function (err) {
+            if (err) {
+              connection.rollback(function () {
+                res.status(500).send("No se ha podido completar la transacción")
+              })
+              return
+            }
+            return res.sendStatus(200)
+          })
         })
       })
     })

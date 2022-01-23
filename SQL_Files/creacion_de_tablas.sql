@@ -22,7 +22,7 @@ CREATE TABLE Partida(
 	horaGuardado  TIME,
 	horasJugadas	int,
 	estadoMaquina  varchar(500),
-	nombreJuego varchar(30) REFERENCES Juego (nombreJuego),
+	nombreJuego varchar(30) NOT NULL REFERENCES Juego (nombreJuego),
 	Creador varchar(20) REFERENCES Usuario (nombreUsuario)
 );
 
@@ -71,7 +71,7 @@ CREATE TABLE CopiaJuego(
 	Version varchar(10),
 	directorioInstalacion varchar(40),
 	Estado varchar(20),
-	nombreUsuario varchar(20) REFERENCES Usuario (nombreUsuario),
+	nombreUsuario varchar(20) NOT NULL REFERENCES Usuario (nombreUsuario),
 	puntosGastados int,
 	PRIMARY KEY (numCopia, nombreJuego)
 );
